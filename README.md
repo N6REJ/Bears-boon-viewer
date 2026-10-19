@@ -5,7 +5,7 @@
 [![Build Release](https://github.com/N6REJ/Bears-boon-viewer/actions/workflows/release.yml/badge.svg)](https://github.com/N6REJ/Bears-boon-viewer/actions/workflows/release.yml)
 [![GitHub release](https://img.shields.io/github/release/N6REJ/Bears-boon-viewer.svg)](https://github.com/N6REJ/Bears-boon-viewer/releases/)
 
-![Ready for 12.0.5](https://img.shields.io/badge/Ready_for-12.0.5-darkgreen)
+![Ready for 12.1.5](https://img.shields.io/badge/Ready_for-12.1.5-darkgreen)
 
 Bears Boon Viewer is a World of Warcraft addon intended to make boon values easier
 to see and use, especially for players with visual impairments. It is designed to
