@@ -7,17 +7,30 @@
 
 ![Ready for 12.0.5](https://img.shields.io/badge/Ready_for-12.0.5-darkgreen)
 
-Bears Boon Viewer is a World of Warcraft addon planned to make boon values easier
-to see and use, especially for players with visual impairments. It will present
-the values in a dedicated on-screen frame, with adjustable font sizing and a
-draggable frame so you can position and scale the information to suit your needs.
+Bears Boon Viewer is a World of Warcraft addon intended to make boon values easier
+to see and use, especially for players with visual impairments. It is designed to
+display the values from spell ID `1280098` in a dedicated on-screen frame that
+can be dragged to a preferred location. The frame automatically resizes to fit
+the spell values at the selected font size. It focuses on the boon percentages
+for maximum health, primary stat, haste, critical strike, mastery, versatility,
+movement speed, and damage reduction.
 
-## Accessibility goals
+## Display settings
 
-- Make boon values quickly readable without searching through other interface
-  elements.
-- Let players increase or decrease the text size for comfortable viewing.
-- Allow the display frame to be moved to a preferred location on screen.
+- Choose from standard in-game fonts.
+- Adjust font size from 8 to 72 pixels; the default is 13 pixels.
+- Choose a font color with the color picker; the default is white.
+- The frame starts to the left of the minimap and below the buff bar when those
+  frames are available. Drag it to reposition; its location is saved per profile.
+
+Open the settings under **Options > AddOns > Bears Boon Viewer**. Use `/bbv` to
+show or hide the display, or `/bbv options` to open its settings.
+
+## Interface compatibility
+
+The display uses AceGUI's standard frame, so it works with the default Blizzard
+UI. When ElvUI is installed, its Ace3 skin automatically styles the frame if
+ElvUI's Ace3 skin option is enabled.
 
 ## Installation
 
@@ -25,7 +38,5 @@ Install the addon into your World of Warcraft `Interface/AddOns` directory, or
 use a compatible addon manager. Once installed, enable **Bears Boon Viewer**
 from the AddOns list at the character selection screen.
 
-## Development status
-
-This addon is under development. Feature details and usage instructions will be
-updated as the display and its configuration are implemented.
+If the spell's tooltip data is not available yet, the frame will refresh when the
+game loads that spell data.
