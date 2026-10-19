@@ -19,7 +19,8 @@ the API identifies as a Lair); it hides automatically when you leave.
 
 ## Display settings
 
-- Choose from standard in-game fonts.
+- Choose from fonts registered with LibSharedMedia, including fonts supplied by
+  ElvUI and other media addons.
 - Adjust font size from 8 to 72 pixels; the default is 13 pixels.
 - Choose a font color with the color picker; the default is white.
 - The frame starts to the left of the minimap and below the buff bar when those

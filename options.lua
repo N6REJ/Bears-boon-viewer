@@ -1,12 +1,6 @@
 local addonName, addonTable = ...
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
-
-local fonts = {
-    ["Fonts\\FRIZQT__.TTF"] = L["Friz Quadrata"],
-    ["Fonts\\ARIALN.TTF"] = L["Arial Narrow"],
-    ["Fonts\\MORPHEUS.ttf"] = L["Morpheus"],
-    ["Fonts\\skurri.ttf"] = L["Skurri"],
-}
+local SharedMedia = LibStub("LibSharedMedia-3.0")
 
 function addonTable.RegisterOptions(addon)
     local options = {
@@ -17,8 +11,10 @@ function addonTable.RegisterOptions(addon)
                 type = "select",
                 order = 1,
                 name = L["Font"],
-                desc = L["Choose a standard World of Warcraft font."],
-                values = fonts,
+                desc = L["Choose a font registered with LibSharedMedia."],
+                values = function()
+                    return SharedMedia:HashTable("font")
+                end,
                 get = function()
                     return addon.db.profile.font
                 end,

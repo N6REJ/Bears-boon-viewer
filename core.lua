@@ -2,8 +2,11 @@ local addonName, addonTable = ...
 
 local AceAddon = LibStub("AceAddon-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
+local SharedMedia = LibStub("LibSharedMedia-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local SPELL_ID = 1280098
+local defaultFontName = SharedMedia["DefaultMedia"].font
+
 local MIN_FRAME_WIDTH = 240
 local MAX_FRAME_WIDTH = 900
 local FRAME_CHROME_WIDTH = 34
@@ -25,7 +28,7 @@ local addon = AceAddon:NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
 
 local defaults = {
     profile = {
-        font = "Fonts\\FRIZQT__.TTF",
+        font = defaultFontName,
         fontSize = 13,
         fontColor = {
             r = 1,
@@ -104,6 +107,14 @@ end
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("BearsBoonViewerDB", defaults, true)
+    local savedFont = self.db.profile.font:lower()
+    for fontName, fontPath in pairs(SharedMedia:HashTable("font")) do
+        if fontPath:lower() == savedFont then
+            self.db.profile.font = fontName
+            break
+        end
+    end
+
     addonTable.RegisterOptions(self)
     self:RegisterChatCommand("boon", "SlashCommand")
 
@@ -157,12 +168,12 @@ function addon:UpdateDisplay()
     local color = profile.fontColor
     local valuesText = GetBoonValues()
 
-    self.valueLabel:SetFont(profile.font, profile.fontSize)
+    self.valueLabel:SetFont(SharedMedia:Fetch("font", profile.font), profile.fontSize)
     self.valueLabel:SetColor(color.r, color.g, color.b)
     self.valueLabel:SetText(valuesText)
 
     local measureText = self.measureText
-    measureText:SetFont(profile.font, profile.fontSize)
+    measureText:SetFont(SharedMedia:Fetch("font", profile.font), profile.fontSize)
 
     local widestLine = 0
     for line in valuesText:gmatch("[^\n]+") do
