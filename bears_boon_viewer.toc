@@ -6,6 +6,9 @@
 ## SavedVariables: BearsBoonViewerDB
 ## OptionalDeps: ElvUI, SharedMedia
 
+## X-License: MIT License
+## X-Curse-Project-ID: 1753628
+
 ## DefaultState: enabled
 
 Libs\LibStub\LibStub.lua
