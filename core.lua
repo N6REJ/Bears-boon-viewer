@@ -27,6 +27,23 @@ local BOON_VALUE_TERMS = {
     "damage reduction",
 }
 
+local FALLBACK_FONT_PATH = "Fonts\\FRIZQT__.TTF"
+
+-- Resolve a LibSharedMedia font name to a path that is safe to hand to
+-- FontString:SetFont. A missing/legacy font file (e.g. the stock "2002 Bold"
+-- -> Fonts\2002B.TTF mapping when ElvUI is not present to supply media) makes
+-- SetFont throw, which would kill UpdateDisplay and prevent the viewer from
+-- ever showing. Fall back gracefully instead of erroring.
+local function SetFontSafe(fontString, fontName, size)
+    local path = SharedMedia:Fetch("font", fontName)
+        or SharedMedia:Fetch("font", defaultFontName)
+        or FALLBACK_FONT_PATH
+    if not pcall(fontString.SetFont, fontString, path, size, "") then
+        pcall(fontString.SetFont, fontString, FALLBACK_FONT_PATH, size, "")
+    end
+    return path
+end
+
 local addon = AceAddon:NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
 
 local defaults = {
@@ -62,14 +79,6 @@ local function IsBoonValueLine(text)
     end
 
     return false
-end
-
-local function IsInBoonActivity()
-    local delves = C_DelvesUI
-    return delves and (
-        (delves.HasActiveDelve and delves.HasActiveDelve())
-        or (delves.IsInLair and delves.IsInLair())
-    ) or false
 end
 
 local function GetBoonValues()
@@ -213,17 +222,38 @@ function addon:CreateDisplay()
     frame:EnableResize(false)
     local nativeFrame = rawget(frame, "frame")
     nativeFrame:SetResizeBounds(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT)
+
+    -- Improve default UI compatibility
+    nativeFrame:SetBackdrop({
+        bgFile = "Interface/DialogFrame/UI-DialogBox-Background",
+        edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
+        tile = true,
+        tileSize = 32,
+        edgeSize = 32,
+        insets = {left = 11, right = 12, top = 12, bottom = 11}
+    })
+    nativeFrame:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
+    nativeFrame:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+
     local content = rawget(frame, "content")
     content:ClearAllPoints()
-    content:SetPoint("TOPLEFT", 17, -27)
-    content:SetPoint("BOTTOMRIGHT", -17, FRAME_CONTENT_BOTTOM_INSET)
-    rawget(frame, "statustext"):GetParent():Hide()
+    -- Use more universal padding values
+    content:SetPoint("TOPLEFT", 16, -28)
+    content:SetPoint("BOTTOMRIGHT", -16, 14)
+
+    -- Hide status bar for cleaner look
+    local statustext = rawget(frame, "statustext")
+    if statustext then
+        statustext:GetParent():Hide()
+    end
+
+    -- Hide default frame buttons more reliably
     for _, child in ipairs({ nativeFrame:GetChildren() }) do
-        local point = child:GetPoint(1)
-        if child:GetObjectType() == "Button" and child:GetHeight() == 24 and point == "BOTTOMLEFT" then
-            child:Hide()
-        elseif child:GetObjectType() == "Button" and child:GetText() == CLOSE then
-            child:Hide()
+        if child:GetObjectType() == "Button" then
+            local text = child:GetText()
+            if text == CLOSE or child:GetHeight() == 24 then
+                child:Hide()
+            end
         end
     end
 
@@ -265,13 +295,12 @@ function addon:UpdateDisplay()
     self.hasBoonValues = true
     self.lastBoonValues = valuesText
 
-    local fontPath = SharedMedia:Fetch("font", profile.font)
-    self.valueLabel:SetFont(fontPath, profile.fontSize, "")
+    SetFontSafe(self.valueLabel, profile.font, profile.fontSize)
     self.valueLabel:SetColor(color.r, color.g, color.b)
     self.valueLabel:SetText(valuesText)
 
     local measureText = self.measureText
-    measureText:SetFont(fontPath, profile.fontSize, "")
+    SetFontSafe(measureText, profile.font, profile.fontSize)
 
     local widestLine = 0
     for line in valuesText:gmatch("[^\n]+") do
@@ -298,10 +327,43 @@ function addon:UpdateDisplay()
     return true, boonValuesBecameAvailable, boonValuesChanged
 end
 
+-- AceGUI's Frame widget saves drag positions as absolute coordinates
+-- (status.left/top) and reapplies them on show. Coordinates saved under one
+-- UI scale/layout (e.g. dragged into place while ElvUI was active) land
+-- off-screen under another, so the frame is technically shown but invisible.
+local function IsSavedFramePositionVisible(position, frameWidth, frameHeight)
+    local left = position.left
+    local top = position.top
+    if not left or not top then
+        return false
+    end
+
+    local uiWidth, uiHeight = UIParent:GetSize()
+    if not uiWidth or uiWidth == 0 then
+        return true
+    end
+
+    -- status.left/top are applied as offsets from UIParent's bottom-left, so
+    -- test the frame's center in that same coordinate space.
+    local centerX = left + frameWidth / 2
+    local centerY = top - frameHeight / 2
+    return centerX >= 0 and centerX <= uiWidth
+        and centerY >= 0 and centerY <= uiHeight
+end
+
 function addon:PositionFrameByDefault(frameWidth)
     local position = self.db.profile.frame
     if position.left and position.top then
-        return true
+        -- AceGUI's Frame widget has no GetHeight; read the native frame.
+        local nativeFrame = self.displayFrame and rawget(self.displayFrame, "frame")
+        local frameHeight = nativeFrame and nativeFrame:GetHeight() or MIN_FRAME_HEIGHT
+        if IsSavedFramePositionVisible(position, frameWidth or MIN_FRAME_WIDTH, frameHeight) then
+            return true
+        end
+        -- Saved position is off-screen under the current UI scale; discard it
+        -- and re-anchor to the default spot beside the minimap.
+        position.left = nil
+        position.top = nil
     end
 
     local map = _G.Minimap
@@ -347,23 +409,26 @@ function addon:RefreshSpellValues()
         return false
     end
 
-    if IsInBoonActivity() then
-        local hasValues, boonValuesBecameAvailable, boonValuesChanged = self:UpdateDisplay()
-        local shouldShow = hasValues and (
-            (self.waitingForBoon and not self.viewerManuallyClosed)
-            or (self.viewerManuallyClosed and boonValuesChanged)
-            or boonValuesBecameAvailable
-        )
-        if shouldShow then
-            self.displayFrame:Show()
-            self.viewerManuallyClosed = false
-            self.waitingForBoon = false
-        end
-        return hasValues
-    else
-        self.displayFrame:Hide()
+    -- The Boons aura is the source of truth for visibility, not the delve
+    -- activity APIs. C_DelvesUI.HasActiveDelve is restricted in Midnight
+    -- (secret values) and can false-negative right when a boon is picked up,
+    -- which previously blocked auto-open while the minimap button (which
+    -- never checked activity) kept working. The aura only exists inside a
+    -- delve and is removed on leave, so values-present == should-be-shown.
+    local hasValues, boonValuesBecameAvailable, boonValuesChanged = self:UpdateDisplay()
+    if not hasValues then
         return false
     end
+
+    local shouldShow = (self.waitingForBoon and not self.viewerManuallyClosed)
+        or (self.viewerManuallyClosed and boonValuesChanged)
+        or boonValuesBecameAvailable
+    if shouldShow then
+        self.displayFrame:Show()
+        self.viewerManuallyClosed = false
+        self.waitingForBoon = false
+    end
+    return true
 end
 
 function addon:OnActivityChanged()
@@ -372,41 +437,42 @@ function addon:OnActivityChanged()
     end
 
     self:ScheduleDefaultPosition()
-    if IsInBoonActivity() then
-        local hasValues = self:RefreshSpellValues()
-        if hasValues and not self.viewerManuallyClosed then
-            self.displayFrame:Show()
-            self.waitingForBoon = false
-        end
-    else
-        self.displayFrame:Hide()
+    local hasValues = self:RefreshSpellValues()
+    if hasValues and not self.viewerManuallyClosed then
+        self.displayFrame:Show()
+        self.waitingForBoon = false
     end
 end
 
 function addon:OnUnitAura(_, unit)
-    if unit == "player" and IsInBoonActivity() then
-        local hasValues = self:RefreshSpellValues()
-        if hasValues and not self.viewerManuallyClosed then
-            self.boonRefreshRetryID = (self.boonRefreshRetryID or 0) + 1
+    if unit ~= "player" then
+        return
+    end
+
+    -- No delve/lair activity check here: the Boons aura itself proves a boon
+    -- was picked up. Gating on C_DelvesUI broke auto-open (restricted/false-
+    -- negative results) while the minimap button kept working.
+    local hasValues = self:RefreshSpellValues()
+    if hasValues and not self.viewerManuallyClosed then
+        self.boonRefreshRetryID = (self.boonRefreshRetryID or 0) + 1
+        return
+    end
+
+    self.boonRefreshRetryID = (self.boonRefreshRetryID or 0) + 1
+    local retryID = self.boonRefreshRetryID
+    local attempts = 0
+    local function retryRefresh()
+        if retryID ~= self.boonRefreshRetryID or self.displayFrame:IsShown() then
             return
         end
 
-        self.boonRefreshRetryID = (self.boonRefreshRetryID or 0) + 1
-        local retryID = self.boonRefreshRetryID
-        local attempts = 0
-        local function retryRefresh()
-            if retryID ~= self.boonRefreshRetryID or not IsInBoonActivity() or self.displayFrame:IsShown() then
-                return
-            end
-
-            attempts = attempts + 1
-            local hasCurrentValues = self:RefreshSpellValues()
-            if (not hasCurrentValues or self.viewerManuallyClosed) and attempts < 10 then
-                C_Timer.After(0.25, retryRefresh)
-            end
+        attempts = attempts + 1
+        local hasCurrentValues = self:RefreshSpellValues()
+        if (not hasCurrentValues or self.viewerManuallyClosed) and attempts < 10 then
+            C_Timer.After(0.25, retryRefresh)
         end
-        C_Timer.After(0.25, retryRefresh)
     end
+    C_Timer.After(0.25, retryRefresh)
 end
 
 function addon:SlashCommand()
