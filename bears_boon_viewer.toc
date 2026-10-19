@@ -1,0 +1,11 @@
+## Interface: 120105
+## Version: 2026.10.19
+## Title: Bears Boon Viewer
+## Notes: Bears Boon Viewer
+## Author: Bearesquishy
+## SavedVariables: BearsBoonViewerDB
+
+## DefaultState: enabled
+
+core.lua
+options.lua
