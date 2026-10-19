@@ -98,7 +98,7 @@ local function GetBoonValues()
             end
 
             if text and IsBoonValueLine(text) then
-                lines[#lines + 1] = text
+                lines[#lines + 1] = text:gsub("%.$", "")
             end
         end
     end
