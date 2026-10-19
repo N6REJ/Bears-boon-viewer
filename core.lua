@@ -8,9 +8,11 @@ local SPELL_ID = 1280098
 local defaultFontName = SharedMedia["DefaultMedia"].font
 
 local MIN_FRAME_WIDTH = 240
+local MIN_FRAME_HEIGHT = 90
 local MAX_FRAME_WIDTH = 900
 local FRAME_CHROME_WIDTH = 34
-local FRAME_CHROME_HEIGHT = 80
+local FRAME_CONTENT_BOTTOM_INSET = 16
+local FRAME_CHROME_HEIGHT = 27 + FRAME_CONTENT_BOTTOM_INSET + 4
 local DEFAULT_POSITION_GAP = 12
 local BOON_VALUE_TERMS = {
     "maximum health",
@@ -36,6 +38,8 @@ local defaults = {
             b = 1,
         },
         frame = {
+            width = MIN_FRAME_WIDTH,
+            height = MIN_FRAME_HEIGHT,
         },
     },
 }
@@ -115,8 +119,11 @@ function addon:OnInitialize()
         end
     end
 
+    _G.SLASH_BEARBoonViewer1 = "/boon"
+    _G.SlashCmdList.BEARBoonViewer = function()
+        self:SlashCommand()
+    end
     addonTable.RegisterOptions(self)
-    self:RegisterChatCommand("boon", "SlashCommand")
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnActivityChanged")
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "OnActivityChanged")
@@ -126,14 +133,15 @@ function addon:OnInitialize()
     self:RegisterEvent("WALK_IN_DATA_UPDATE", "OnActivityChanged")
     self:RegisterEvent("SPELLS_CHANGED", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", "RefreshSpellValues")
-    self:RegisterEvent("PLAYER_STATS_CHANGED", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_TALENT_UPDATE", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "RefreshSpellValues")
     self:RegisterEvent("UNIT_AURA", "OnUnitAura")
+    self:Print("Loaded. Type /boon to open options.")
 end
 
 function addon:OnEnable()
     self:CreateDisplay()
+    self:ScheduleDefaultPosition()
     self:OnActivityChanged()
 end
 
@@ -144,10 +152,30 @@ function addon:CreateDisplay()
 
     local frame = AceGUI:Create("Frame")
     frame:SetTitle(L["Bears Boon Viewer"])
-    frame:SetStatusText(L["Drag this window to move it."])
     frame:SetLayout("Flow")
     frame:SetStatusTable(self.db.profile.frame)
     frame:EnableResize(false)
+    local nativeFrame = rawget(frame, "frame")
+    nativeFrame:SetResizeBounds(MIN_FRAME_WIDTH, MIN_FRAME_HEIGHT)
+    local content = rawget(frame, "content")
+    content:ClearAllPoints()
+    content:SetPoint("TOPLEFT", 17, -27)
+    content:SetPoint("BOTTOMRIGHT", -17, FRAME_CONTENT_BOTTOM_INSET)
+    rawget(frame, "statustext"):GetParent():Hide()
+    for _, child in ipairs({ nativeFrame:GetChildren() }) do
+        local point = child:GetPoint(1)
+        if child:GetObjectType() == "Button" and child:GetHeight() == 24 and point == "BOTTOMLEFT" then
+            child:Hide()
+        elseif child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+            child:Hide()
+        end
+    end
+
+    local closeButton = CreateFrame("Button", nil, nativeFrame, "UIPanelCloseButton")
+    closeButton:SetPoint("TOPRIGHT", nativeFrame, "TOPRIGHT", 2, 1)
+    closeButton:SetScript("OnClick", function()
+        frame:Hide()
+    end)
 
     local valueLabel = AceGUI:Create("Label")
     valueLabel:SetFullWidth(true)
@@ -168,12 +196,13 @@ function addon:UpdateDisplay()
     local color = profile.fontColor
     local valuesText = GetBoonValues()
 
-    self.valueLabel:SetFont(SharedMedia:Fetch("font", profile.font), profile.fontSize)
+    local fontPath = SharedMedia:Fetch("font", profile.font)
+    self.valueLabel:SetFont(fontPath, profile.fontSize, "")
     self.valueLabel:SetColor(color.r, color.g, color.b)
     self.valueLabel:SetText(valuesText)
 
     local measureText = self.measureText
-    measureText:SetFont(SharedMedia:Fetch("font", profile.font), profile.fontSize)
+    measureText:SetFont(fontPath, profile.fontSize, "")
 
     local widestLine = 0
     for line in valuesText:gmatch("[^\n]+") do
@@ -184,8 +213,9 @@ function addon:UpdateDisplay()
 
     local contentWidth = math.min(MAX_FRAME_WIDTH - FRAME_CHROME_WIDTH, widestLine)
     contentWidth = math.max(MIN_FRAME_WIDTH - FRAME_CHROME_WIDTH, contentWidth)
+    self.displayFrameWidth = contentWidth + FRAME_CHROME_WIDTH
 
-    self.displayFrame:SetWidth(contentWidth + FRAME_CHROME_WIDTH)
+    self.displayFrame:SetWidth(self.displayFrameWidth)
     self.valueLabel:SetWidth(contentWidth)
     self.displayFrame:DoLayout()
     self.valueLabel:SetWidth(contentWidth)
@@ -195,20 +225,20 @@ function addon:UpdateDisplay()
     measureText:SetText(valuesText)
     local contentHeight = math.max(profile.fontSize, measureText:GetStringHeight())
     self.displayFrame:SetHeight(contentHeight + FRAME_CHROME_HEIGHT)
-    self:PositionFrameByDefault(contentWidth + FRAME_CHROME_WIDTH)
+    self:PositionFrameByDefault(self.displayFrameWidth)
 end
 
 function addon:PositionFrameByDefault(frameWidth)
     local position = self.db.profile.frame
     if position.left and position.top then
-        return
+        return true
     end
 
     local map = _G.Minimap
     local mapLeft = map and map:GetLeft()
     local mapTop = map and map:GetTop()
     if not mapLeft or not mapTop then
-        return
+        return false
     end
 
     local top = mapTop
@@ -221,6 +251,25 @@ function addon:PositionFrameByDefault(frameWidth)
     position.left = mapLeft - frameWidth - DEFAULT_POSITION_GAP
     position.top = top - DEFAULT_POSITION_GAP
     self.displayFrame:ApplyStatus()
+    return true
+end
+
+function addon:ScheduleDefaultPosition()
+    if self.positionTimer then
+        return
+    end
+
+    local attempts = 0
+    local timer
+    timer = C_Timer.NewTicker(0.5, function()
+        attempts = attempts + 1
+        local frameWidth = self.displayFrameWidth or MIN_FRAME_WIDTH
+        if self:PositionFrameByDefault(frameWidth) or attempts >= 40 then
+            timer:Cancel()
+            self.positionTimer = nil
+        end
+    end)
+    self.positionTimer = timer
 end
 
 function addon:RefreshSpellValues()
@@ -240,6 +289,7 @@ function addon:OnActivityChanged()
         return
     end
 
+    self:ScheduleDefaultPosition()
     if IsInBoonActivity() then
         self:RefreshSpellValues()
         self.displayFrame:Show()
@@ -255,5 +305,5 @@ function addon:OnUnitAura(_, unit)
 end
 
 function addon:SlashCommand()
-    LibStub("AceConfigDialog-3.0"):Open(addonName)
+    rawget(self, "OpenOptionsDialog")()
 end

@@ -5,7 +5,6 @@ L["Bears Boon Viewer"] = true
 L["Boon values are not available yet."] = true
 L["Choose a font registered with LibSharedMedia."] = true
 L["Choose the display text color."] = true
-L["Drag this window to move it."] = true
 L["Font"] = true
 L["Font color"] = true
 L["Font size"] = true

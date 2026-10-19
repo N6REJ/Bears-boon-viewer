@@ -30,9 +30,10 @@ Open the settings under **Options > AddOns > Bears Boon Viewer** or use `/boon`.
 
 ## Interface compatibility
 
-The display uses AceGUI's standard frame, so it works with the default Blizzard
-UI. When ElvUI is installed, its Ace3 skin automatically styles the frame if
-ElvUI's Ace3 skin option is enabled.
+The release package includes its Ace3 and LibSharedMedia libraries; it does not
+require another addon to provide them. WoW addons can share Ace3 libraries
+through LibStub, so a newer compatible copy loaded by another addon may be used
+at runtime. ElvUI is optional and can style the frame if its Ace3 skin is enabled.
 
 ## Installation
 
@@ -42,5 +43,5 @@ from the AddOns list at the character selection screen.
 
 The development checkout can be tested directly through the AddOns folder junction
 at `C:\Gaming\World of Warcraft\_retail_\Interface\AddOns\Bears_Boon_Viewer`.
-The local `Libs` folders are junctions to the installed Ace3 libraries; packaged
-releases include their own Ace3 libraries.
+Its ignored local `Libs` folders are development-only junctions; release builds
+populate the libraries from the sources declared in `.pkgmeta`.

@@ -2,6 +2,15 @@ local addonName, addonTable = ...
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local SharedMedia = LibStub("LibSharedMedia-3.0")
 
+local function GetFontOptions()
+    local fonts = {}
+    for _, fontName in ipairs(SharedMedia:List("font")) do
+        fonts[fontName] = fontName
+    end
+
+    return fonts
+end
+
 function addonTable.RegisterOptions(addon)
     local options = {
         type = "group",
@@ -10,11 +19,10 @@ function addonTable.RegisterOptions(addon)
             font = {
                 type = "select",
                 order = 1,
+                width = "full",
                 name = L["Font"],
                 desc = L["Choose a font registered with LibSharedMedia."],
-                values = function()
-                    return SharedMedia:HashTable("font")
-                end,
+                values = GetFontOptions,
                 get = function()
                     return addon.db.profile.font
                 end,
@@ -26,6 +34,7 @@ function addonTable.RegisterOptions(addon)
             fontSize = {
                 type = "range",
                 order = 2,
+                width = "full",
                 name = L["Font size"],
                 desc = L["Set the display text size in pixels."],
                 min = 8,
@@ -42,6 +51,7 @@ function addonTable.RegisterOptions(addon)
             fontColor = {
                 type = "color",
                 order = 3,
+                width = "full",
                 name = L["Font color"],
                 desc = L["Choose the display text color."],
                 hasAlpha = false,
@@ -60,8 +70,11 @@ function addonTable.RegisterOptions(addon)
         },
     }
 
-    local AceConfig = LibStub("AceConfig-3.0")
+    local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-    AceConfig:RegisterOptionsTable(addonName, options)
+    AceConfigRegistry:RegisterOptionsTable(addonName, options)
     AceConfigDialog:AddToBlizOptions(addonName, L["Bears Boon Viewer"])
+    addon.OpenOptionsDialog = function()
+        AceConfigDialog:Open(addonName)
+    end
 end
