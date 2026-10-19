@@ -13,7 +13,7 @@ local MIN_FRAME_HEIGHT = 90
 local MAX_FRAME_WIDTH = 900
 local FRAME_CHROME_WIDTH = 34
 local FRAME_CONTENT_BOTTOM_INSET = 16
-local FRAME_CHROME_HEIGHT = 27 + FRAME_CONTENT_BOTTOM_INSET + 4
+local FRAME_CHROME_HEIGHT = 27 + FRAME_CONTENT_BOTTOM_INSET + 4 + 6
 local DEFAULT_POSITION_GAP = 12
 local BOON_VALUE_TERMS = {
     "maximum health",
@@ -238,7 +238,7 @@ function addon:CreateDisplay()
     local content = rawget(frame, "content")
     content:ClearAllPoints()
     -- Use more universal padding values
-    content:SetPoint("TOPLEFT", 16, -28)
+    content:SetPoint("TOPLEFT", 20, -28)
     content:SetPoint("BOTTOMRIGHT", -16, 14)
 
     -- Hide status bar for cleaner look
