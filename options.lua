@@ -1,6 +1,8 @@
 local addonName, addonTable = ...
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local SharedMedia = LibStub("LibSharedMedia-3.0")
+local MIN_FONT_SIZE = 8
+local MAX_FONT_SIZE = 48
 
 local function GetFontOptions()
     local fonts = {}
@@ -31,14 +33,21 @@ function addonTable.RegisterOptions(addon)
                     addon:UpdateDisplay()
                 end,
             },
+            fontSpacing = {
+                type = "description",
+                order = 2,
+                width = "full",
+                name = " ",
+                fontSize = "small",
+            },
             fontSize = {
                 type = "range",
-                order = 2,
+                order = 3,
                 width = "full",
                 name = L["Font size"],
                 desc = L["Set the display text size in pixels."],
-                min = 8,
-                max = 72,
+                min = MIN_FONT_SIZE,
+                max = MAX_FONT_SIZE,
                 step = 1,
                 get = function()
                     return addon.db.profile.fontSize
@@ -48,9 +57,38 @@ function addonTable.RegisterOptions(addon)
                     addon:UpdateDisplay()
                 end,
             },
+            decreaseFontSize = {
+                type = "execute",
+                order = 4,
+                width = 0.48,
+                name = L["Smaller"],
+                desc = L["Decrease the display text size by one pixel."],
+                func = function()
+                    addon.db.profile.fontSize = math.max(MIN_FONT_SIZE, addon.db.profile.fontSize - 1)
+                    addon:UpdateDisplay()
+                end,
+            },
+            increaseFontSize = {
+                type = "execute",
+                order = 5,
+                width = 0.48,
+                name = L["Larger"],
+                desc = L["Increase the display text size by one pixel."],
+                func = function()
+                    addon.db.profile.fontSize = math.min(MAX_FONT_SIZE, addon.db.profile.fontSize + 1)
+                    addon:UpdateDisplay()
+                end,
+            },
+            fontColorSpacing = {
+                type = "description",
+                order = 6,
+                width = "full",
+                name = " ",
+                fontSize = "small",
+            },
             fontColor = {
                 type = "color",
-                order = 3,
+                order = 7,
                 width = "full",
                 name = L["Font color"],
                 desc = L["Choose the display text color."],

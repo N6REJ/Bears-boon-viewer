@@ -5,7 +5,8 @@ local AceGUI = LibStub("AceGUI-3.0")
 local SharedMedia = LibStub("LibSharedMedia-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local SPELL_ID = 1280098
-local defaultFontName = SharedMedia["DefaultMedia"].font
+local BOON_ICON = "Interface\\Icons\\spell_azerite_essence08"
+local defaultFontName = "2002 Bold"
 
 local MIN_FRAME_WIDTH = 240
 local MIN_FRAME_HEIGHT = 90
@@ -31,7 +32,7 @@ local addon = AceAddon:NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
 local defaults = {
     profile = {
         font = defaultFontName,
-        fontSize = 13,
+        fontSize = 12,
         fontColor = {
             r = 1,
             g = 1,
@@ -74,7 +75,7 @@ end
 local function GetBoonValues()
     local aura = C_UnitAuras.GetPlayerAuraBySpellID(SPELL_ID)
     if not aura or not aura.auraInstanceID then
-        return L["Boon values are not available yet."]
+        return nil
     end
 
     local tooltipData = C_TooltipInfo.GetUnitAuraByAuraInstanceID("player", aura.auraInstanceID)
@@ -106,11 +107,16 @@ local function GetBoonValues()
         return table.concat(lines, "\n")
     end
 
-    return L["Boon values are not available yet."]
+    return nil
 end
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("BearsBoonViewerDB", defaults, true)
+    self.waitingForBoon = false
+    self.hasBoonValues = false
+    self.lastBoonValues = nil
+    self.viewerManuallyClosed = false
+    self.boonRefreshRetryID = 0
     local savedFont = self.db.profile.font:lower()
     for fontName, fontPath in pairs(SharedMedia:HashTable("font")) do
         if fontPath:lower() == savedFont then
@@ -141,8 +147,58 @@ end
 
 function addon:OnEnable()
     self:CreateDisplay()
+    self:CreateMinimapButton()
     self:ScheduleDefaultPosition()
     self:OnActivityChanged()
+end
+
+function addon:CreateMinimapButton()
+    if self.minimapButton or not _G.Minimap then
+        return
+    end
+
+    local button = CreateFrame("Button", "BearsBoonViewerMinimapButton", _G.Minimap)
+    button:SetSize(32, 32)
+    button:SetFrameStrata("MEDIUM")
+    button:SetFrameLevel(_G.Minimap:GetFrameLevel() + 5)
+    button:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+    local radius = _G.Minimap:GetWidth() / 2 + 4
+    local angle = math.rad(225)
+    button:SetPoint("CENTER", _G.Minimap, "CENTER", math.cos(angle) * radius, math.sin(angle) * radius)
+
+    local overlay = button:CreateTexture(nil, "OVERLAY")
+    overlay:SetSize(50, 50)
+    overlay:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    overlay:SetVertexColor(1, 0.82, 0.2)
+    overlay:SetPoint("TOPLEFT", button, "TOPLEFT")
+
+    local background = button:CreateTexture(nil, "BACKGROUND")
+    background:SetSize(24, 24)
+    background:SetTexture("Interface\\Minimap\\UI-Minimap-Background")
+    background:SetPoint("CENTER", button, "CENTER")
+
+    local icon = button:CreateTexture(nil, "ARTWORK")
+    icon:SetTexture(BOON_ICON)
+    icon:SetSize(22, 22)
+    icon:SetPoint("CENTER", button, "CENTER")
+    button.icon = icon
+
+    button:SetScript("OnEnter", function(buttonFrame)
+        GameTooltip:SetOwner(buttonFrame, "ANCHOR_LEFT")
+        GameTooltip:SetText(L["Bears Boon Viewer"])
+        GameTooltip:AddLine(L["Click to show the boon viewer."])
+        GameTooltip:Show()
+    end)
+    button:SetScript("OnLeave", GameTooltip_Hide)
+    button:SetScript("OnClick", function()
+        if self:UpdateDisplay() then
+            self.viewerManuallyClosed = false
+            self.displayFrame:Show()
+            self.waitingForBoon = false
+        end
+    end)
+
+    self.minimapButton = button
 end
 
 function addon:CreateDisplay()
@@ -174,6 +230,8 @@ function addon:CreateDisplay()
     local closeButton = CreateFrame("Button", nil, nativeFrame, "UIPanelCloseButton")
     closeButton:SetPoint("TOPRIGHT", nativeFrame, "TOPRIGHT", 2, 1)
     closeButton:SetScript("OnClick", function()
+        self.viewerManuallyClosed = true
+        self.waitingForBoon = false
         frame:Hide()
     end)
 
@@ -189,12 +247,23 @@ end
 
 function addon:UpdateDisplay()
     if not self.valueLabel then
-        return
+        return false
     end
 
     local profile = self.db.profile
     local color = profile.fontColor
     local valuesText = GetBoonValues()
+    if not valuesText then
+        self.hasBoonValues = false
+        self.lastBoonValues = nil
+        self.waitingForBoon = true
+        self.displayFrame:Hide()
+        return false
+    end
+    local boonValuesBecameAvailable = not self.hasBoonValues
+    local boonValuesChanged = self.lastBoonValues ~= nil and self.lastBoonValues ~= valuesText
+    self.hasBoonValues = true
+    self.lastBoonValues = valuesText
 
     local fontPath = SharedMedia:Fetch("font", profile.font)
     self.valueLabel:SetFont(fontPath, profile.fontSize, "")
@@ -226,6 +295,7 @@ function addon:UpdateDisplay()
     local contentHeight = math.max(profile.fontSize, measureText:GetStringHeight())
     self.displayFrame:SetHeight(contentHeight + FRAME_CHROME_HEIGHT)
     self:PositionFrameByDefault(self.displayFrameWidth)
+    return true, boonValuesBecameAvailable, boonValuesChanged
 end
 
 function addon:PositionFrameByDefault(frameWidth)
@@ -274,13 +344,25 @@ end
 
 function addon:RefreshSpellValues()
     if not self.displayFrame then
-        return
+        return false
     end
 
     if IsInBoonActivity() then
-        self:UpdateDisplay()
+        local hasValues, boonValuesBecameAvailable, boonValuesChanged = self:UpdateDisplay()
+        local shouldShow = hasValues and (
+            (self.waitingForBoon and not self.viewerManuallyClosed)
+            or (self.viewerManuallyClosed and boonValuesChanged)
+            or boonValuesBecameAvailable
+        )
+        if shouldShow then
+            self.displayFrame:Show()
+            self.viewerManuallyClosed = false
+            self.waitingForBoon = false
+        end
+        return hasValues
     else
         self.displayFrame:Hide()
+        return false
     end
 end
 
@@ -291,8 +373,11 @@ function addon:OnActivityChanged()
 
     self:ScheduleDefaultPosition()
     if IsInBoonActivity() then
-        self:RefreshSpellValues()
-        self.displayFrame:Show()
+        local hasValues = self:RefreshSpellValues()
+        if hasValues and not self.viewerManuallyClosed then
+            self.displayFrame:Show()
+            self.waitingForBoon = false
+        end
     else
         self.displayFrame:Hide()
     end
@@ -300,7 +385,27 @@ end
 
 function addon:OnUnitAura(_, unit)
     if unit == "player" and IsInBoonActivity() then
-        self:RefreshSpellValues()
+        local hasValues = self:RefreshSpellValues()
+        if hasValues and not self.viewerManuallyClosed then
+            self.boonRefreshRetryID = (self.boonRefreshRetryID or 0) + 1
+            return
+        end
+
+        self.boonRefreshRetryID = (self.boonRefreshRetryID or 0) + 1
+        local retryID = self.boonRefreshRetryID
+        local attempts = 0
+        local function retryRefresh()
+            if retryID ~= self.boonRefreshRetryID or not IsInBoonActivity() or self.displayFrame:IsShown() then
+                return
+            end
+
+            attempts = attempts + 1
+            local hasCurrentValues = self:RefreshSpellValues()
+            if (not hasCurrentValues or self.viewerManuallyClosed) and attempts < 10 then
+                C_Timer.After(0.25, retryRefresh)
+            end
+        end
+        C_Timer.After(0.25, retryRefresh)
     end
 end
 

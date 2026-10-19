@@ -3,6 +3,7 @@
 ## Title: Bears Boon Viewer
 ## Notes: Bears Boon Viewer
 ## Author: Bearesquishy
+## IconTexture: Interface\Icons\spell_azerite_essence08
 ## SavedVariables: BearsBoonViewerDB
 ## OptionalDeps: ElvUI, SharedMedia
 
