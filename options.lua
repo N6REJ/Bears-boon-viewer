@@ -40,10 +40,34 @@ function addonTable.RegisterOptions(addon)
                 name = " ",
                 fontSize = "small",
             },
+            decreaseFontSize = {
+                type = "execute",
+                order = 3,
+                width = "relative",
+                relWidth = 0.11,
+                name = L["Smaller"],
+                desc = L["Decrease the display text size by one pixel."],
+                func = function()
+                    addon.db.profile.fontSize = math.max(MIN_FONT_SIZE, addon.db.profile.fontSize - 1)
+                    addon:UpdateDisplay()
+                end,
+            },
+            -- Flow layout stacks children with no spacing, so empty fixed-
+            -- fraction descriptions act as gaps. All widths in this row are
+            -- relative fractions that sum to 0.99 so the row can never wrap,
+            -- and the slider (0.73) absorbs everything the buttons/gaps leave.
+            fontSizeGapLeft = {
+                type = "description",
+                order = 4,
+                width = "relative",
+                relWidth = 0.02,
+                name = "",
+            },
             fontSize = {
                 type = "range",
-                order = 3,
-                width = "full",
+                order = 5,
+                width = "relative",
+                relWidth = 0.73,
                 name = L["Font size"],
                 desc = L["Set the display text size in pixels."],
                 min = MIN_FONT_SIZE,
@@ -57,21 +81,18 @@ function addonTable.RegisterOptions(addon)
                     addon:UpdateDisplay()
                 end,
             },
-            decreaseFontSize = {
-                type = "execute",
-                order = 4,
-                width = 0.48,
-                name = L["Smaller"],
-                desc = L["Decrease the display text size by one pixel."],
-                func = function()
-                    addon.db.profile.fontSize = math.max(MIN_FONT_SIZE, addon.db.profile.fontSize - 1)
-                    addon:UpdateDisplay()
-                end,
+            fontSizeGapRight = {
+                type = "description",
+                order = 6,
+                width = "relative",
+                relWidth = 0.02,
+                name = "",
             },
             increaseFontSize = {
                 type = "execute",
-                order = 5,
-                width = 0.48,
+                order = 7,
+                width = "relative",
+                relWidth = 0.11,
                 name = L["Larger"],
                 desc = L["Increase the display text size by one pixel."],
                 func = function()
@@ -81,14 +102,14 @@ function addonTable.RegisterOptions(addon)
             },
             fontColorSpacing = {
                 type = "description",
-                order = 6,
+                order = 8,
                 width = "full",
                 name = " ",
                 fontSize = "small",
             },
             fontColor = {
                 type = "color",
-                order = 7,
+                order = 9,
                 width = "full",
                 name = L["Font color"],
                 desc = L["Choose the display text color."],
