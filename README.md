@@ -52,8 +52,3 @@ loaded by another addon may be used at runtime.
 Install the addon into your World of Warcraft `Interface/AddOns` directory, or
 use a compatible addon manager. Once installed, enable **Bears Boon Viewer**
 from the AddOns list at the character selection screen.
-
-The development checkout can be tested directly through the AddOns folder junction
-at `C:\Gaming\World of Warcraft\_retail_\Interface\AddOns\Bears_Boon_Viewer`.
-Its ignored local `Libs` folders are development-only junctions; release builds
-populate the libraries from the sources declared in `.pkgmeta`.
