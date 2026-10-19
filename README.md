@@ -2,7 +2,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Size](https://img.shields.io/github/repo-size/N6REJ/Bears-boon-viewer)
-[![Build Release](https://github.com/N6REJ/Bears-boon-viewer/actions/workflows/release.yml/badge.svg)](https://github.com/N6REJ/Bears-boon-viewer/actions/workflows/release.yml)
 [![GitHub release](https://img.shields.io/github/release/N6REJ/Bears-boon-viewer.svg)](https://github.com/N6REJ/Bears-boon-viewer/releases/)
 
 ![Ready for 12.1.5](https://img.shields.io/badge/Ready_for-12.1.5-darkgreen)
