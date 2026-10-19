@@ -21,6 +21,8 @@ when you leave or when those values are unavailable, and appears when values
 become available. Values refresh when the player aura, talents, specialization,
 equipment, or spell data changes.
 
+<img width="457" height="280" alt="report" src="https://github.com/user-attachments/assets/ce522b95-1e6c-47f6-bd6e-8c260aabd9bf" />
+
 ## Display settings
 
 - Choose from fonts currently registered with LibSharedMedia. The font list is
