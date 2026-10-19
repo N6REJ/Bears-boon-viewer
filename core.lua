@@ -56,8 +56,21 @@ local function IsBoonValueLine(text)
     return false
 end
 
-local function GetSpellValues()
-    local tooltipData = C_TooltipInfo.GetSpellByID(SPELL_ID)
+local function IsInBoonActivity()
+    local delves = C_DelvesUI
+    return delves and (
+        (delves.HasActiveDelve and delves.HasActiveDelve())
+        or (delves.IsInLair and delves.IsInLair())
+    ) or false
+end
+
+local function GetBoonValues()
+    local aura = C_UnitAuras.GetPlayerAuraBySpellID(SPELL_ID)
+    if not aura or not aura.auraInstanceID then
+        return L["Boon values are not available yet."]
+    end
+
+    local tooltipData = C_TooltipInfo.GetUnitAuraByAuraInstanceID("player", aura.auraInstanceID)
     local lines = {}
 
     if tooltipData and tooltipData.lines then
@@ -86,48 +99,31 @@ local function GetSpellValues()
         return table.concat(lines, "\n")
     end
 
-    if C_Spell and C_Spell.GetSpellDescription then
-        local description = C_Spell.GetSpellDescription(SPELL_ID)
-        if description and description ~= "" then
-            for line in StripTooltipColors(description):gmatch("[^\n]+") do
-                if IsBoonValueLine(line) then
-                    lines[#lines + 1] = line
-                end
-            end
-
-            if #lines > 0 then
-                return table.concat(lines, "\n")
-            end
-        end
-    end
-
-    return L["Spell values are not available yet."]
+    return L["Boon values are not available yet."]
 end
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("BearsBoonViewerDB", defaults, true)
     addonTable.RegisterOptions(self)
-    self:RegisterChatCommand("bbv", "SlashCommand")
-    self:RegisterChatCommand("boonviewer", "SlashCommand")
+    self:RegisterChatCommand("boon", "SlashCommand")
 
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", "RefreshSpellValues")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnActivityChanged")
+    self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "OnActivityChanged")
+    self:RegisterEvent("ZONE_CHANGED", "OnActivityChanged")
+    self:RegisterEvent("PLAYER_DIFFICULTY_CHANGED", "OnActivityChanged")
+    self:RegisterEvent("ACTIVE_DELVE_DATA_UPDATE", "OnActivityChanged")
+    self:RegisterEvent("WALK_IN_DATA_UPDATE", "OnActivityChanged")
     self:RegisterEvent("SPELLS_CHANGED", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_STATS_CHANGED", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_TALENT_UPDATE", "RefreshSpellValues")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", "RefreshSpellValues")
-    self:RegisterEvent("SPELL_DATA_LOAD_RESULT", "OnSpellDataLoadResult")
     self:RegisterEvent("UNIT_AURA", "OnUnitAura")
 end
 
 function addon:OnEnable()
-    if C_Spell and C_Spell.RequestLoadSpellData then
-        C_Spell.RequestLoadSpellData(SPELL_ID)
-    end
-
     self:CreateDisplay()
-    self:RefreshSpellValues()
-    self.displayFrame:Show()
+    self:OnActivityChanged()
 end
 
 function addon:CreateDisplay()
@@ -159,7 +155,7 @@ function addon:UpdateDisplay()
 
     local profile = self.db.profile
     local color = profile.fontColor
-    local valuesText = GetSpellValues()
+    local valuesText = GetBoonValues()
 
     self.valueLabel:SetFont(profile.font, profile.fontSize)
     self.valueLabel:SetColor(color.r, color.g, color.b)
@@ -221,34 +217,32 @@ function addon:RefreshSpellValues()
         return
     end
 
-    self:UpdateDisplay()
+    if IsInBoonActivity() then
+        self:UpdateDisplay()
+    else
+        self.displayFrame:Hide()
+    end
 end
 
-function addon:OnSpellDataLoadResult(_, spellID, success)
-    if spellID == SPELL_ID and success then
+function addon:OnActivityChanged()
+    if not self.displayFrame then
+        return
+    end
+
+    if IsInBoonActivity() then
         self:RefreshSpellValues()
+        self.displayFrame:Show()
+    else
+        self.displayFrame:Hide()
     end
 end
 
 function addon:OnUnitAura(_, unit)
-    if unit == "player" then
+    if unit == "player" and IsInBoonActivity() then
         self:RefreshSpellValues()
     end
 end
 
-function addon:SlashCommand(input)
-    if input and input:lower() == "options" then
-        LibStub("AceConfigDialog-3.0"):Open(addonName)
-        return
-    end
-
-    if not self.displayFrame then
-        self:CreateDisplay()
-    end
-
-    if self.displayFrame:IsShown() then
-        self.displayFrame:Hide()
-    else
-        self.displayFrame:Show()
-    end
+function addon:SlashCommand()
+    LibStub("AceConfigDialog-3.0"):Open(addonName)
 end

@@ -14,6 +14,8 @@ can be dragged to a preferred location. The frame automatically resizes to fit
 the spell values at the selected font size. It focuses on the boon percentages
 for maximum health, primary stat, haste, critical strike, mastery, versatility,
 movement speed, and damage reduction.
+The display is shown only while you are in a Delve or Lair (the in-game activity
+the API identifies as a Lair); it hides automatically when you leave.
 
 ## Display settings
 
@@ -23,8 +25,7 @@ movement speed, and damage reduction.
 - The frame starts to the left of the minimap and below the buff bar when those
   frames are available. Drag it to reposition; its location is saved per profile.
 
-Open the settings under **Options > AddOns > Bears Boon Viewer**. Use `/bbv` to
-show or hide the display, or `/bbv options` to open its settings.
+Open the settings under **Options > AddOns > Bears Boon Viewer** or use `/boon`.
 
 ## Interface compatibility
 
@@ -38,5 +39,7 @@ Install the addon into your World of Warcraft `Interface/AddOns` directory, or
 use a compatible addon manager. Once installed, enable **Bears Boon Viewer**
 from the AddOns list at the character selection screen.
 
-If the spell's tooltip data is not available yet, the frame will refresh when the
-game loads that spell data.
+The development checkout can be tested directly through the AddOns folder junction
+at `C:\Gaming\World of Warcraft\_retail_\Interface\AddOns\Bears_Boon_Viewer`.
+The local `Libs` folders are junctions to the installed Ace3 libraries; packaged
+releases include their own Ace3 libraries.
