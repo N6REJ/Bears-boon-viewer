@@ -59,6 +59,9 @@ local defaults = {
             width = MIN_FRAME_WIDTH,
             height = MIN_FRAME_HEIGHT,
         },
+        -- Angle in degrees around the minimap where the button sits.
+        -- WoW screen Y grows upward, so 270 = bottom, 90 = top, 0 = right.
+        minimapButtonAngle = 270,
     },
 }
 
@@ -161,6 +164,18 @@ function addon:OnEnable()
     self:OnActivityChanged()
 end
 
+function addon:UpdateMinimapButtonPosition(button)
+    button = button or self.minimapButton
+    if not button or not _G.Minimap then
+        return
+    end
+
+    local radius = _G.Minimap:GetWidth() / 2 + 4
+    local angle = math.rad(self.db.profile.minimapButtonAngle or 90)
+    button:ClearAllPoints()
+    button:SetPoint("CENTER", _G.Minimap, "CENTER", math.cos(angle) * radius, math.sin(angle) * radius)
+end
+
 function addon:CreateMinimapButton()
     if self.minimapButton or not _G.Minimap then
         return
@@ -171,9 +186,32 @@ function addon:CreateMinimapButton()
     button:SetFrameStrata("MEDIUM")
     button:SetFrameLevel(_G.Minimap:GetFrameLevel() + 5)
     button:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
-    local radius = _G.Minimap:GetWidth() / 2 + 4
-    local angle = math.rad(225)
-    button:SetPoint("CENTER", _G.Minimap, "CENTER", math.cos(angle) * radius, math.sin(angle) * radius)
+    button:SetMovable(true)
+    button:SetClampedToScreen(true)
+    button:RegisterForDrag("LeftButton")
+
+    self:UpdateMinimapButtonPosition(button)
+
+    -- Keep the button glued to the minimap ring at the current angle as the
+    -- cursor moves, so the button follows the mouse around the minimap edge.
+    local function UpdateAngleFromCursor()
+        local scale = _G.Minimap:GetEffectiveScale()
+        local mapX, mapY = _G.Minimap:GetCenter()
+        local cursorX, cursorY = GetCursorPosition()
+        cursorX, cursorY = cursorX / scale, cursorY / scale
+        local angle = math.deg(math.atan2(cursorY - mapY, cursorX - mapX))
+        self.db.profile.minimapButtonAngle = angle
+        self:UpdateMinimapButtonPosition(button)
+    end
+
+    button:SetScript("OnDragStart", function(buttonFrame)
+        buttonFrame:SetScript("OnUpdate", UpdateAngleFromCursor)
+        UpdateAngleFromCursor()
+    end)
+    button:SetScript("OnDragStop", function(buttonFrame)
+        buttonFrame:SetScript("OnUpdate", nil)
+        UpdateAngleFromCursor()
+    end)
 
     local overlay = button:CreateTexture(nil, "OVERLAY")
     overlay:SetSize(50, 50)
@@ -395,6 +433,7 @@ function addon:ScheduleDefaultPosition()
     local timer
     timer = C_Timer.NewTicker(0.5, function()
         attempts = attempts + 1
+        self:UpdateMinimapButtonPosition()
         local frameWidth = self.displayFrameWidth or MIN_FRAME_WIDTH
         if self:PositionFrameByDefault(frameWidth) or attempts >= 40 then
             timer:Cancel()
