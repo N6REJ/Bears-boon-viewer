@@ -48,7 +48,7 @@ CurseForge mod `1753628`, tracked by [curseforge-downloads-action](https://githu
 | Window | 365 days |
 | Snapshots | 1 |
 | Partial | day, week, month, year |
-| Generated at | `2026-10-21T00:04:08.141Z` |
+| Generated at | `2026-10-21T00:08:27.617Z` |
 
 Source data: [`curseforge/downloads.json`](https://raw.githubusercontent.com/N6REJ/Bears-boon-viewer/stats-data/curseforge/downloads.json)
 
