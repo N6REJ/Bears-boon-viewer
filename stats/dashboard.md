@@ -41,20 +41,21 @@ Charts are generated on the first run. Customize them freely; only the data tabl
 | Metric | Value |
 |---|---|
 | Total | 39 |
-| Day | 0 (partial) |
-| Week | 0 (partial) |
-| Month | 0 (partial) |
-| Year | 0 (partial) |
+| Day | 39 (partial) |
+| Week | 39 (partial) |
+| Month | 39 (partial) |
+| Year | 39 (partial) |
 
 | Field | Value |
 |---|---|
 | Repository | `N6REJ/Bears-boon-viewer` |
 | CurseForge mod id | `1753628` |
 | Update mode | daily |
+| Period | week `2026-W43`, month `Oct 2026`, year `2026` |
 | Window | 365 days |
 | Snapshots | 1 |
 | Partial | day, week, month, year |
-| Generated at | `2026-10-21T01:05:28.957Z` |
+| Generated at | `2026-10-21T08:55:24.554Z` |
 
 Source data: [`stats/downloads.json`](https://raw.githubusercontent.com/N6REJ/Bears-boon-viewer/main/stats/downloads.json)
 
