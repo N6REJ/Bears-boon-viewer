@@ -1,21 +1,43 @@
 {
-  "schemaVersion": "1",
+  "schemaVersion": "2",
   "owner": "N6REJ",
   "repo": "Bears-boon-viewer",
   "visibility": "public",
-  "generatedAt": "2026-10-21T00:16:16.933Z",
+  "generatedAt": "2026-10-21T08:55:24.554Z",
   "stats": {
     "total": 39,
-    "day": 0,
-    "week": 0,
-    "month": 0,
-    "year": 0
+    "day": 39,
+    "week": 39,
+    "month": 39,
+    "year": 39
   },
   "partial": {
     "day": true,
     "week": true,
     "month": true,
     "year": true
+  },
+  "periods": {
+    "day": {
+      "start": "2026-10-21",
+      "end": "2026-10-21",
+      "label": "2026-10-21"
+    },
+    "week": {
+      "start": "2026-10-19",
+      "end": "2026-10-25",
+      "label": "2026-W43"
+    },
+    "month": {
+      "start": "2026-10-01",
+      "end": "2026-10-31",
+      "label": "Oct 2026"
+    },
+    "year": {
+      "start": "2026-01-01",
+      "end": "2026-12-31",
+      "label": "2026"
+    }
   },
   "snapshots": {
     "windowDays": 365,
