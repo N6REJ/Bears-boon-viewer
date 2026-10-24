@@ -26,6 +26,17 @@ local BOON_VALUE_TERMS = {
     "incoming damage",
     "damage reduction",
 }
+local DEMO_BOON_VALUES = {
+    L["Maximum Health"] .. ": 0%",
+    L["Primary Stat"] .. ": 0%",
+    L["Haste"] .. ": 0%",
+    L["Critical Strike"] .. ": 0%",
+    L["Mastery"] .. ": 0%",
+    L["Versatility"] .. ": 0%",
+    L["Movement Speed"] .. ": 0%",
+    L["Incoming Damage"] .. ": 0%",
+    L["Damage Reduction"] .. ": 0%",
+}
 
 local FALLBACK_FONT_PATH = "Fonts\\FRIZQT__.TTF"
 
@@ -238,7 +249,7 @@ function addon:CreateMinimapButton()
     end)
     button:SetScript("OnLeave", GameTooltip_Hide)
     button:SetScript("OnClick", function()
-        self:UpdateDisplay()
+        self:UpdateDisplay(true)
         if self.displayFrame then
             self.viewerManuallyClosed = false
             self.waitingForBoon = false
@@ -314,7 +325,7 @@ function addon:CreateDisplay()
     self.measureText:Hide()
 end
 
-function addon:UpdateDisplay()
+function addon:UpdateDisplay(showDemoWhenUnavailable)
     if not self.valueLabel then
         return false
     end
@@ -326,8 +337,11 @@ function addon:UpdateDisplay()
         self.hasBoonValues = false
         self.lastBoonValues = nil
         self.waitingForBoon = true
-        self.displayFrame:Hide()
-        return false
+        if not showDemoWhenUnavailable then
+            self.displayFrame:Hide()
+            return false
+        end
+        valuesText = table.concat(DEMO_BOON_VALUES, "\n")
     end
     local boonValuesBecameAvailable = not self.hasBoonValues
     local boonValuesChanged = self.lastBoonValues ~= nil and self.lastBoonValues ~= valuesText
