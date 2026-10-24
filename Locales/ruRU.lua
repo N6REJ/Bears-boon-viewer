@@ -1,0 +1,18 @@
+local addonName = ...
+local L = LibStub("AceLocale-3.0"):NewLocale(addonName, "ruRU")
+if not L then return end
+
+L["Bears Boon Viewer"] = "Bears Boon Viewer"
+L["Click to show the boon viewer."] = "Нажмите, чтобы показать окно даров."
+L["Choose a font registered with LibSharedMedia."] = "Выберите шрифт, зарегистрированный в LibSharedMedia."
+L["Choose the display text color."] = "Выберите цвет отображаемого текста."
+L["Font"] = "Шрифт"
+L["Font color"] = "Цвет шрифта"
+L["Font size"] = "Размер шрифта"
+L["Increase the display text size by one pixel."] = "Увеличить размер отображаемого текста на один пиксель."
+L["Larger"] = "Больше"
+L["Decrease the display text size by one pixel."] = "Уменьшить размер отображаемого текста на один пиксель."
+L["Smaller"] = "Меньше"
+L["Set the display text size in pixels."] = "Задать размер отображаемого текста в пикселях."
+L["Live Preview"] = "Предпросмотр"
+L["Show or hide the boon viewer for preview."] = "Показать или скрыть окно даров для предпросмотра."

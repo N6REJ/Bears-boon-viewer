@@ -1,0 +1,18 @@
+local addonName = ...
+local L = LibStub("AceLocale-3.0"):NewLocale(addonName, "koKR")
+if not L then return end
+
+L["Bears Boon Viewer"] = "Bears Boon Viewer"
+L["Click to show the boon viewer."] = "클릭하여 은총 표시기를 엽니다."
+L["Choose a font registered with LibSharedMedia."] = "LibSharedMedia에 등록된 글꼴을 선택합니다."
+L["Choose the display text color."] = "표시 텍스트의 색상을 선택합니다."
+L["Font"] = "글꼴"
+L["Font color"] = "글꼴 색상"
+L["Font size"] = "글꼴 크기"
+L["Increase the display text size by one pixel."] = "표시 텍스트 크기를 1픽셀 늘립니다."
+L["Larger"] = "크게"
+L["Decrease the display text size by one pixel."] = "표시 텍스트 크기를 1픽셀 줄입니다."
+L["Smaller"] = "작게"
+L["Set the display text size in pixels."] = "표시 텍스트 크기를 픽셀 단위로 설정합니다."
+L["Live Preview"] = "실시간 미리보기"
+L["Show or hide the boon viewer for preview."] = "미리보기를 위해 은총 표시기를 표시하거나 숨깁니다."

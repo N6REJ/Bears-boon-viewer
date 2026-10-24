@@ -1,0 +1,18 @@
+local addonName = ...
+local L = LibStub("AceLocale-3.0"):NewLocale(addonName, "zhCN")
+if not L then return end
+
+L["Bears Boon Viewer"] = "Bears Boon Viewer"
+L["Click to show the boon viewer."] = "点击显示恩赐查看器。"
+L["Choose a font registered with LibSharedMedia."] = "选择在 LibSharedMedia 中注册的字体。"
+L["Choose the display text color."] = "选择显示文本的颜色。"
+L["Font"] = "字体"
+L["Font color"] = "字体颜色"
+L["Font size"] = "字体大小"
+L["Increase the display text size by one pixel."] = "将显示文本大小增加 1 像素。"
+L["Larger"] = "放大"
+L["Decrease the display text size by one pixel."] = "将显示文本大小减小 1 像素。"
+L["Smaller"] = "缩小"
+L["Set the display text size in pixels."] = "以像素为单位设置显示文本的大小。"
+L["Live Preview"] = "实时预览"
+L["Show or hide the boon viewer for preview."] = "显示或隐藏恩赐查看器以进行预览。"
