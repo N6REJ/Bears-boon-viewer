@@ -238,10 +238,11 @@ function addon:CreateMinimapButton()
     end)
     button:SetScript("OnLeave", GameTooltip_Hide)
     button:SetScript("OnClick", function()
-        if self:UpdateDisplay() then
+        self:UpdateDisplay()
+        if self.displayFrame then
             self.viewerManuallyClosed = false
-            self.displayFrame:Show()
             self.waitingForBoon = false
+            self.displayFrame:Show()
         end
     end)
 

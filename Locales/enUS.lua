@@ -13,3 +13,5 @@ L["Larger"] = true
 L["Decrease the display text size by one pixel."] = true
 L["Smaller"] = true
 L["Set the display text size in pixels."] = true
+L["Live Preview"] = true
+L["Show or hide the boon viewer for preview."] = true

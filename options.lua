@@ -133,7 +133,72 @@ function addonTable.RegisterOptions(addon)
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
     AceConfigRegistry:RegisterOptionsTable(addonName, options)
     AceConfigDialog:AddToBlizOptions(addonName, L["Bears Boon Viewer"])
+
+    local previewButton
+
+    local function TogglePreview()
+        if not addon.displayFrame then
+            addon:CreateDisplay()
+        end
+        addon:UpdateDisplay()
+        if addon.displayFrame and addon.displayFrame:IsShown() then
+            addon.viewerManuallyClosed = true
+            addon.waitingForBoon = false
+            addon.displayFrame:Hide()
+        elseif addon.displayFrame then
+            addon.viewerManuallyClosed = false
+            addon.waitingForBoon = false
+            addon.displayFrame:Show()
+        end
+    end
+
+    local function CreatePreviewButton()
+        if not AceConfigDialog.OpenFrames then
+            return
+        end
+        local frame = AceConfigDialog.OpenFrames[addonName]
+        if not frame then
+            return
+        end
+        local parent = frame.frame or frame
+        if not parent then
+            return
+        end
+        if previewButton and previewButton:GetParent() == parent then
+            return
+        end
+        if previewButton then
+            previewButton:Hide()
+            previewButton:SetParent(nil)
+            previewButton = nil
+        end
+        previewButton = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+        previewButton:SetSize(90, 22)
+        previewButton:SetText(L["Live Preview"])
+        previewButton:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -10, -8)
+        previewButton:SetScript("OnClick", TogglePreview)
+        previewButton:Show()
+    end
+
+    local origOpen = AceConfigDialog.Open
+    AceConfigDialog.Open = function(self, appName, ...)
+        local ret = origOpen(self, appName, ...)
+        if appName == addonName then
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, CreatePreviewButton)
+            else
+                CreatePreviewButton()
+            end
+        end
+        return ret
+    end
+
     addon.OpenOptionsDialog = function()
         AceConfigDialog:Open(addonName)
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0, CreatePreviewButton)
+        else
+            CreatePreviewButton()
+        end
     end
 end
