@@ -1,5 +1,9 @@
 package-as: Bears_Boon_Viewer
 
+manual-changelog:
+    filename: CHANGELOG.md
+    markup-type: markdown
+
 ignore:
     - README.md
     - .github
@@ -9,6 +13,7 @@ ignore:
     - .gitattributes
     - .idea
     - AGENTS.md
+    - stats
 
 enable-nolib-creation: no
 
