@@ -1,82 +1,51 @@
 # Bears Boon Viewer
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Size](https://img.shields.io/github/repo-size/N6REJ/Bears-boon-viewer)
-[![GitHub release](https://img.shields.io/github/release/N6REJ/Bears-boon-viewer.svg)](https://github.com/N6REJ/Bears-boon-viewer/releases/)
+[![WoW Version](https://img.shields.io/badge/WoW-12.1.5-darkgreen)](https://worldofwarcraft.blizzard.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![GitHub](https://img.shields.io/badge/GitHub-Source-blue?logo=github)](https://github.com/N6REJ/Bears-boon-viewer)
 
-![Ready for 12.1.5](https://img.shields.io/badge/Ready_for-12.1.5-darkgreen)
+Bears Boon Viewer makes the active boon values easier to see, with customizable text designed to support readability and accessibility.
 
-Bears Boon Viewer is a World of Warcraft addon intended to make boon values easier
-to see and use, especially for players with visual impairments. It is designed to
-display the values from spell ID `1280098` in a dedicated on-screen frame that
-can be dragged to a preferred location. It reads the values from the boon aura's
-tooltip and automatically sizes and lays out the frame to fit the current text
-and font settings. It displays the boon percentages for maximum health, primary
-stat, haste, critical strike, mastery, versatility, movement speed, incoming
-damage, and damage reduction.
-The display is shown only while you are in a Delve or Lair (the in-game activity
-the API identifies as a Lair) and the boon aura has readable values. It hides
-when you leave or when those values are unavailable, and appears when values
-become available. Values refresh when the player aura, talents, specialization,
-equipment, or spell data changes.
+The movable on-screen viewer reads boon percentages from the aura tooltip and automatically fits its size to the displayed values. It shows while you’re in a Delve or Lair when readable boon values are available, refreshes as values change, and hides when you leave or the values are unavailable.
 
-The addon also helps locate **Mislaid Curiosity** treasure chests inside Delves
-and Labyrinths by scanning for their vignettes and showing red pins on the
-minimap and world map (see below).
+## Features
 
-<img width="457" height="280" alt="report" src="https://github.com/user-attachments/assets/ce522b95-1e6c-47f6-bd6e-8c260aabd9bf" />
-
-## Display settings
-
-- Choose from fonts currently registered with LibSharedMedia. The font list is
-  populated dynamically when the options panel requests its choices, so fonts
-  registered by media addons can be selected without a fixed list in this addon.
-- The default font is 2002 Bold at 12 pixels; adjust the size from 8 to 48 pixels
-  with the size slider or the Smaller and Larger buttons.
-- Choose a font color with the color picker; the default is white.
-- Font, size, and color changes take effect immediately. The display frame
-  recalculates its dimensions and text layout after each change.
-- The frame starts to the left of the minimap and below the buff bar when those
-  frames are available. Drag it to reposition; its location is saved per profile.
-
-Open the settings under **Options > AddOns > Bears Boon Viewer** or use `/boon`.
-The viewer has an X in its upper-right corner to hide it. Click the Bears Boon
-Viewer minimap button to refresh and show the display again. The addon-list icon
-and minimap button use the Boons spell icon; the minimap button has a gold-tinted
-tracking ring.
+*   Displays boon values for maximum health, primary stat, haste, critical strike, mastery, versatility, movement speed, incoming damage, and damage reduction.
+*   Automatically opens when boon values become available, including after gaining a boon while the viewer is closed.
+*   Choose from fonts registered with LibSharedMedia, adjust font size from 8–48 px, and set the text color. Changes apply immediately.
+*   Resize and position the display automatically to fit its text; drag it to save a preferred position.
+*   Close the viewer with the X, then reopen it using the minimap button.
+*   The minimap button and addon-list entry use the Boons spell icon.
+*   Inside Delves and Labyrinths only, maps **Mislaid Curiosity** treasure chests with red chest pins for identified curiosities and orange chest pins for mystery (brown circle) vignettes, on both the minimap and the world map.
 
 ## Mislaid Curiosity pins
 
-In addition to the boon display, the addon can help locate **Mislaid Curiosities**
-(hidden treasure chests) while you are in a Delve or Labyrinth. While scanning is
-active it watches for the Mislaid Curiosity vignette, records each location across
-the related maps of the current Delve/Labyrinth, and shows red pins:
+While scanning is active the addon watches for Mislaid Curiosity vignettes, records each location across the related maps of the current Delve or Labyrinth, and shows chest pins:
 
-- **Minimap pins** appear for locations near you, projected onto the minimap and
-  clamped to its edge when out of view. Pins fade when pushed to the edge.
-- **World map pins** appear for every mapped location on the world map, so you can
-  plan a route before walking to them.
-- Pins are removed automatically once you get close enough to loot the chest.
+*   **Minimap pins** appear for locations near you, projected onto the minimap and clamped to its edge when out of view. Pins fade when pushed to the edge.
+*   **World map pins** appear for every mapped location on the world map, so you can plan a route before walking to them.
+*   Identified curiosities use **red** pins; mystery vignettes that show as brown circles with no tooltip use **orange** pins.
+*   Pins are removed automatically once you get close enough to loot the chest.
 
-Scanning only runs inside a Delve or Labyrinth and only when **Show Mislaid
-Curiosity treasure chest pins** is enabled (on by default). Two options control it:
+Scanning only runs inside a Delve or Labyrinth. Two options control it:
 
-- **Show Mislaid Curiosity treasure chest pins** — turns minimap/world map pins on
-  or off.
-- **Scan interval (seconds)** — how often to re-scan for Mislaid Curiosities
-  (0.5 to 10 seconds, default 2.0).
+*   **Show Mislaid Curiosity treasure chest pins** — turns minimap/world map pins on or off.
+*   **Scan interval (seconds)** — how often to re-scan for Mislaid Curiosities (0.5 to 10 seconds, default 2.0).
 
-Hover a pin for a tooltip reading "Potential Mislaid Curiosity".
+Hover a pin for a tooltip reading “Potential Mislaid Curiosity”.
 
-## Interface compatibility
+## Usage
 
-The release package includes standard Ace3 and LibSharedMedia libraries; it does
-not require another addon to provide them or use ElvUI library forks. WoW addons
-can share Ace3 libraries through LibStub, so a newer compatible standard copy
-loaded by another addon may be used at runtime.
+Type `/boon` to open the options. Use the minimap button to show the viewer again when boon values are available.
+
+The options panel also includes a **Live Preview** button that toggles a sample display using localized placeholder values.
+
+## Libraries
+
+The release includes standard Ace3 and LibSharedMedia libraries. ElvUI is not required, and the addon does not use ElvUI library forks.
 
 ## Installation
 
-Install the addon into your World of Warcraft `Interface/AddOns` directory, or
-use a compatible addon manager. Once installed, enable **Bears Boon Viewer**
-from the AddOns list at the character selection screen.
+Install the addon into your World of Warcraft `Interface/AddOns` directory, or use a compatible addon manager. Once installed, enable **Bears Boon Viewer** from the AddOns list at the character selection screen.
+
+## Demo
+
+[Demo](https://www.youtube.com/watch?v=K592afad2jY)

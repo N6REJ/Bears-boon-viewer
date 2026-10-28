@@ -373,6 +373,7 @@ function scanner:CreateBoonPin(vignetteGUID)
         texture:SetVertexColor(1.0, 0.1, 0.1, 1.0)
         texture:SetSnapToPixelGrid(true)
         texture:SetTexelSnappingBias(0)
+        pin.texture = texture
     end
 
     pin.vignetteGUID = vignetteGUID
@@ -428,6 +429,11 @@ function scanner:EnsureMapDataProvider()
             if position then
                 local pin = _G.WorldMapFrame:AcquirePin("BearsBoonFinderMapPinTemplate", location)
                 pin:SetPosition(position.x, position.y)
+                if location.isMystery then
+                    pin.Icon:SetVertexColor(1.0, 0.55, 0.0, 1.0)
+                else
+                    pin.Icon:SetVertexColor(1.0, 0.1, 0.1, 1.0)
+                end
                 pin:SetScript("OnEnter", function(frame)
                     GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
                     GameTooltip:SetText(L["Potential Mislaid Curiosity"], 1, 1, 1)
@@ -479,7 +485,12 @@ function scanner:ScanVignettes()
         if not ok then
             vignetteInfo = nil
         end
-        if GetCuriosityVignetteID(vignetteGUID, vignetteInfo) == CURIOSITY_VIGNETTE_ID then
+        local curiosityID = GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
+        -- Mystery vignettes have no readable vignette info and show as brown
+        -- circles on the minimap. Treat them as potential Mislaid Curiosities
+        -- too, so they get mapped and marked like the identified ones.
+        local isMystery = (vignetteInfo == nil) or IsSecret(vignetteInfo)
+        if curiosityID == CURIOSITY_VIGNETTE_ID or isMystery then
             curiosityCount = curiosityCount + 1
             if not vignetteInfo then
                 hiddenCount = hiddenCount + 1
@@ -487,6 +498,7 @@ function scanner:ScanVignettes()
 
             live[vignetteGUID] = true
             local location = self.locations[vignetteGUID] or { maps = {} }
+            location.isMystery = isMystery
             local positions = GetVignetteMapPositions(vignetteGUID, mapIDs)
             local hasPosition = next(positions) ~= nil
             for mapID, position in pairs(positions) do
@@ -599,6 +611,13 @@ function scanner:DrawPins()
             if relativeDistance <= 1.15 then
                 local pin = self.pins[vignetteGUID] or self:CreateBoonPin(vignetteGUID)
                 pin:SetSize(iconSize, iconSize)
+                if pin.texture then
+                    if location.isMystery then
+                        pin.texture:SetVertexColor(1.0, 0.55, 0.0, 1.0)
+                    else
+                        pin.texture:SetVertexColor(1.0, 0.1, 0.1, 1.0)
+                    end
+                end
                 local x, y, onEdge = ProjectToMinimap(east, north, projectionScale, facing, squareMinimap)
                 pin:ClearAllPoints()
                 pin:SetPoint("CENTER", minimap, "CENTER", x * pinHalfWidth, y * pinHalfHeight)
