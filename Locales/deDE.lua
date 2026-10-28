@@ -37,5 +37,7 @@ L["Mapped Mislaid Curiosities: %d; treasure chest pins nearby: %d."] = "Zugeordn
 L["No mapped Mislaid Curiosities found on %s. Curiosity vignettes: %d; hidden: %d; positions: %d; mapped: %d; maps checked: %d."] = "Keine zugeordneten verlegten Neugierden auf %s gefunden. Neugier-Vignetten: %d; versteckt: %d; Positionen: %d; zugeordnet: %d; geprüfte Karten: %d."
 L["Unknown Delve map"] = "Unbekannte Tiefenkarte"
 L["Show Mislaid Curiosity treasure chest pins"] = "Markierungen für Schatztruhen verlegter Neugier anzeigen"
+L["Show mystery vignette pins"] = "Markierungen für mysteriöse Vignetten anzeigen"
+L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."] = "Verfolgt mysteriöse (braune Kreis) Vignetten als mögliche verlegte Neugierden."
 L["Scan interval (seconds)"] = "Scanintervall (Sekunden)"
 L["How often to scan for Mislaid Curiosities."] = "Wie oft nach verlegten Neugierden gescannt wird."

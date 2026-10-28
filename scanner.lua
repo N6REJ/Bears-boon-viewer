@@ -490,7 +490,7 @@ function scanner:ScanVignettes()
         -- circles on the minimap. Treat them as potential Mislaid Curiosities
         -- too, so they get mapped and marked like the identified ones.
         local isMystery = (vignetteInfo == nil) or IsSecret(vignetteInfo)
-        if curiosityID == CURIOSITY_VIGNETTE_ID or isMystery then
+        if curiosityID == CURIOSITY_VIGNETTE_ID or (isMystery and addon.db.profile.showMysteryPins ~= false) then
             curiosityCount = curiosityCount + 1
             if not vignetteInfo then
                 hiddenCount = hiddenCount + 1

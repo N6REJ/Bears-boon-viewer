@@ -37,5 +37,7 @@ L["Mapped Mislaid Curiosities: %d; treasure chest pins nearby: %d."] = "已映�
 L["No mapped Mislaid Curiosities found on %s. Curiosity vignettes: %d; hidden: %d; positions: %d; mapped: %d; maps checked: %d."] = "在 %s 上未找到已映射的遗失的好奇心。好奇标记：%d；隐藏：%d；位置：%d；已映射：%d；已检查地图：%d。"
 L["Unknown Delve map"] = "未知地下堡地图"
 L["Show Mislaid Curiosity treasure chest pins"] = "显示遗失的好奇心宝藏箱图钉"
+L["Show mystery vignette pins"] = "显示神秘标记图钉"
+L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."] = "将神秘（棕色圆圈）标记作为潜在的遗失的好奇心进行追踪。"
 L["Scan interval (seconds)"] = "扫描间隔（秒）"
 L["How often to scan for Mislaid Curiosities."] = "扫描遗失的好奇心的频率。"

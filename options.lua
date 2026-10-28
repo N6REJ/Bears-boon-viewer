@@ -32,6 +32,34 @@ function addonTable.RegisterOptions(addon)
                     addon:GetModule("Scanner"):UpdateActivity()
                 end,
             },
+            showMysteryPins = {
+                type = "toggle",
+                order = 0.5,
+                width = "full",
+                name = L["Show mystery vignette pins"],
+                desc = L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."],
+                get = function()
+                    return addon.db.profile.showMysteryPins ~= false
+                end,
+                set = function(_, value)
+                    addon.db.profile.showMysteryPins = value
+                    local scanner = addon:GetModule("Scanner")
+                    if not value then
+                        for guid, location in pairs(scanner.locations) do
+                            if location.isMystery then
+                                scanner.locations[guid] = nil
+                                scanner:ReleasePin(guid)
+                            end
+                        end
+                        scanner:RefreshMapPins()
+                        scanner:DrawPins()
+                    end
+                    scanner:UpdateActivity()
+                    if scanner.scanning then
+                        scanner:ScanVignettes()
+                    end
+                end,
+            },
             scanInterval = {
                 type = "range",
                 order = 1,

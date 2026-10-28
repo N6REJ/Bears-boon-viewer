@@ -75,6 +75,7 @@ local defaults = {
         -- WoW screen Y grows upward, so 270 = bottom, 90 = top, 0 = right.
         minimapButtonAngle = 270,
         showBoonPins = true,
+        showMysteryPins = true,
         scanInterval = 2.0,
     },
 }

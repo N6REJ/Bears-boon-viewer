@@ -14,7 +14,7 @@ The movable on-screen viewer reads boon percentages from the aura tooltip and au
 *   Resize and position the display automatically to fit its text; drag it to save a preferred position.
 *   Close the viewer with the X, then reopen it using the minimap button.
 *   The minimap button and addon-list entry use the Boons spell icon.
-*   Inside Delves and Labyrinths only, maps **Mislaid Curiosity** treasure chests with red chest pins for identified curiosities and orange chest pins for mystery (brown circle) vignettes, on both the minimap and the world map.
+*   Inside Delves and Labyrinths only, maps **Mislaid Curiosity** treasure chests: red pins for vignettes the game identifies as Mislaid Curiosities, and orange pins for "mystery" vignettes (brown circles with no tooltip) that may also be Mislaid Curiosities. Pins appear on both the minimap and the world map.
 
 ## Mislaid Curiosity pins
 
@@ -22,12 +22,13 @@ While scanning is active the addon watches for Mislaid Curiosity vignettes, reco
 
 *   **Minimap pins** appear for locations near you, projected onto the minimap and clamped to its edge when out of view. Pins fade when pushed to the edge.
 *   **World map pins** appear for every mapped location on the world map, so you can plan a route before walking to them.
-*   Identified curiosities use **red** pins; mystery vignettes that show as brown circles with no tooltip use **orange** pins.
+*   **Red** pins mark vignettes the game identifies as Mislaid Curiosities. **Orange** pins mark "mystery" vignettes (brown circles with no tooltip) that may also be Mislaid Curiosities; these can be turned off with the **Show mystery vignette pins** option.
 *   Pins are removed automatically once you get close enough to loot the chest.
 
 Scanning only runs inside a Delve or Labyrinth. Two options control it:
 
 *   **Show Mislaid Curiosity treasure chest pins** — turns minimap/world map pins on or off.
+*   **Show mystery vignette pins** — when enabled, mystery (brown circle) vignettes are also tracked as potential Mislaid Curiosities (on by default).
 *   **Scan interval (seconds)** — how often to re-scan for Mislaid Curiosities (0.5 to 10 seconds, default 2.0).
 
 Hover a pin for a tooltip reading “Potential Mislaid Curiosity”.

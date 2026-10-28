@@ -36,5 +36,7 @@ L["Mapped Mislaid Curiosities: %d; treasure chest pins nearby: %d."] = true
 L["No mapped Mislaid Curiosities found on %s. Curiosity vignettes: %d; hidden: %d; positions: %d; mapped: %d; maps checked: %d."] = true
 L["Unknown Delve map"] = true
 L["Show Mislaid Curiosity treasure chest pins"] = true
+L["Show mystery vignette pins"] = true
+L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."] = true
 L["Scan interval (seconds)"] = true
 L["How often to scan for Mislaid Curiosities."] = true

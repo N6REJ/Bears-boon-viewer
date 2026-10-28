@@ -37,5 +37,7 @@ L["Mapped Mislaid Curiosities: %d; treasure chest pins nearby: %d."] = "Curiosid
 L["No mapped Mislaid Curiosities found on %s. Curiosity vignettes: %d; hidden: %d; positions: %d; mapped: %d; maps checked: %d."] = "Nenhuma curiosidade extraviada mapeada encontrada em %s. Vignettes de curiosidade: %d; ocultas: %d; posições: %d; mapeadas: %d; mapas verificados: %d."
 L["Unknown Delve map"] = "Mapa de Cova desconhecido"
 L["Show Mislaid Curiosity treasure chest pins"] = "Mostrar marcadores de baús do tesouro de curiosidade extraviada"
+L["Show mystery vignette pins"] = "Mostrar marcadores de vignette misteriosa"
+L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."] = "Rastreia vignettes misteriosas (círculos marrons) como possíveis curiosidades extraviadas."
 L["Scan interval (seconds)"] = "Intervalo de escaneamento (segundos)"
 L["How often to scan for Mislaid Curiosities."] = "Com que frequência escanear em busca de curiosidades extraviadas."

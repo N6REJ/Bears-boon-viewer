@@ -37,5 +37,7 @@ L["Mapped Mislaid Curiosities: %d; treasure chest pins nearby: %d."] = "매핑�
 L["No mapped Mislaid Curiosities found on %s. Curiosity vignettes: %d; hidden: %d; positions: %d; mapped: %d; maps checked: %d."] = "%s에서 매핑된 분실된 호기심을 찾지 못했습니다. 호기심 비네트: %d; 숨김: %d; 위치: %d; 매핑됨: %d; 확인된 지도: %d."
 L["Unknown Delve map"] = "알 수 없는 구덩이 지도"
 L["Show Mislaid Curiosity treasure chest pins"] = "분실된 호기심 보물 상자 핀 표시"
+L["Show mystery vignette pins"] = "미스터리 비네트 핀 표시"
+L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."] = "미스터리(갈색 원) 비네트를 잠재적 분실된 호기심으로 추적합니다."
 L["Scan interval (seconds)"] = "스캔 간격(초)"
 L["How often to scan for Mislaid Curiosities."] = "분실된 호기심을 얼마나 자주 스캔할지."
