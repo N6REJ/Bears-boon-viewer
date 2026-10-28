@@ -75,7 +75,11 @@ local defaults = {
         -- WoW screen Y grows upward, so 270 = bottom, 90 = top, 0 = right.
         minimapButtonAngle = 270,
         showBoonPins = true,
-        showMysteryPins = true,
+        pinColor = {
+            r = 0,
+            g = 1,
+            b = 0,
+        },
         scanInterval = 2.0,
     },
 }
@@ -139,6 +143,21 @@ end
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("BearsBoonViewerDB", defaults, true)
+
+    -- Migrate legacy string pin colors to RGB tables.
+    local profile = self.db.profile
+    if type(profile.pinColor) == "string" then
+        local legacy = {
+            red = { 1.0, 0.1, 0.1 },
+            green = { 0.0, 1.0, 0.0 },
+            blue = { 0.1, 0.5, 1.0 },
+            yellow = { 1.0, 1.0, 0.0 },
+        }
+        local color = legacy[profile.pinColor] or legacy.green
+        profile.pinColor = { r = color[1], g = color[2], b = color[3] }
+    elseif type(profile.pinColor) ~= "table" then
+        profile.pinColor = { r = 0, g = 1, b = 0 }
+    end
     self.waitingForBoon = false
     self.hasBoonValues = false
     self.lastBoonValues = nil

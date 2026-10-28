@@ -32,34 +32,6 @@ function addonTable.RegisterOptions(addon)
                     addon:GetModule("Scanner"):UpdateActivity()
                 end,
             },
-            showMysteryPins = {
-                type = "toggle",
-                order = 0.5,
-                width = "full",
-                name = L["Show mystery vignette pins"],
-                desc = L["Track mystery (brown circle) vignettes as potential Mislaid Curiosities."],
-                get = function()
-                    return addon.db.profile.showMysteryPins ~= false
-                end,
-                set = function(_, value)
-                    addon.db.profile.showMysteryPins = value
-                    local scanner = addon:GetModule("Scanner")
-                    if not value then
-                        for guid, location in pairs(scanner.locations) do
-                            if location.isMystery then
-                                scanner.locations[guid] = nil
-                                scanner:ReleasePin(guid)
-                            end
-                        end
-                        scanner:RefreshMapPins()
-                        scanner:DrawPins()
-                    end
-                    scanner:UpdateActivity()
-                    if scanner.scanning then
-                        scanner:ScanVignettes()
-                    end
-                end,
-            },
             scanInterval = {
                 type = "range",
                 order = 1,
@@ -182,6 +154,36 @@ function addonTable.RegisterOptions(addon)
                     color.g = green
                     color.b = blue
                     addon:UpdateDisplay()
+                end,
+            },
+            pinColor = {
+                type = "color",
+                order = 100,
+                width = "full",
+                name = L["Pin color"],
+                desc = L["Choose the color of Mislaid Curiosity pins."],
+                hasAlpha = false,
+                get = function()
+                    local color = addon.db.profile.pinColor
+                    if type(color) ~= "table" then
+                        color = { r = 0, g = 1, b = 0 }
+                    end
+                    return color.r, color.g, color.b
+                end,
+                set = function(_, red, green, blue)
+                    local color = addon.db.profile.pinColor
+                    if type(color) ~= "table" then
+                        color = { r = 0, g = 1, b = 0 }
+                        addon.db.profile.pinColor = color
+                    end
+                    color.r = red
+                    color.g = green
+                    color.b = blue
+                    local scanner = addon:GetModule("Scanner")
+                    scanner:RefreshMapPins()
+                    if scanner.scanning then
+                        scanner:DrawPins()
+                    end
                 end,
             },
         },

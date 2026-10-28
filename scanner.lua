@@ -13,6 +13,22 @@ local BOON_PIN_MAX_SIZE = 32
 local REFERENCE_MINIMAP_VIEW_RADIUS = 300
 local EDGE_ALPHA = 0.6
 local FALLBACK_MINIMAP_SPAN = 0.18
+
+local PIN_COLORS = {
+    red = { 1.0, 0.1, 0.1 },
+    green = { 0.0, 1.0, 0.0 },
+    blue = { 0.1, 0.5, 1.0 },
+    yellow = { 1.0, 1.0, 0.0 },
+}
+
+local function GetSelectedPinColor()
+    local profile = addon.db and addon.db.profile
+    local color = profile and profile.pinColor
+    if type(color) == "table" then
+        return color.r or 0, color.g or 1, color.b or 0
+    end
+    return 0, 1, 0
+end
 local LOOT_DISTANCE = 0.018
 
 local INSTANCE_EVENTS = {
@@ -370,7 +386,8 @@ function scanner:CreateBoonPin(vignetteGUID)
         local texture = pin:CreateTexture(nil, "OVERLAY")
         texture:SetAllPoints()
         texture:SetAtlas("VignetteLoot")
-        texture:SetVertexColor(1.0, 0.1, 0.1, 1.0)
+        local r, g, b = GetSelectedPinColor()
+        texture:SetVertexColor(r, g, b, 1.0)
         texture:SetSnapToPixelGrid(true)
         texture:SetTexelSnappingBias(0)
         pin.texture = texture
@@ -429,11 +446,8 @@ function scanner:EnsureMapDataProvider()
             if position then
                 local pin = _G.WorldMapFrame:AcquirePin("BearsBoonFinderMapPinTemplate", location)
                 pin:SetPosition(position.x, position.y)
-                if location.isMystery then
-                    pin.Icon:SetVertexColor(0.0, 1.0, 0.0, 1.0)
-                else
-                    pin.Icon:SetVertexColor(1.0, 0.1, 0.1, 1.0)
-                end
+                local r, g, b = GetSelectedPinColor()
+                pin.Icon:SetVertexColor(r, g, b, 1.0)
                 pin:SetScript("OnEnter", function(frame)
                     GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
                     GameTooltip:SetText(L["Potential Mislaid Curiosity"], 1, 1, 1)
@@ -486,11 +500,7 @@ function scanner:ScanVignettes()
             vignetteInfo = nil
         end
         local curiosityID = GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
-        -- Mystery vignettes have no readable vignette info and show as brown
-        -- circles on the minimap. Treat them as potential Mislaid Curiosities
-        -- too, so they get mapped and marked like the identified ones.
-        local isMystery = (vignetteInfo == nil) or IsSecret(vignetteInfo)
-        if curiosityID == CURIOSITY_VIGNETTE_ID or (isMystery and addon.db.profile.showMysteryPins ~= false) then
+        if curiosityID == CURIOSITY_VIGNETTE_ID then
             curiosityCount = curiosityCount + 1
             if not vignetteInfo then
                 hiddenCount = hiddenCount + 1
@@ -498,7 +508,6 @@ function scanner:ScanVignettes()
 
             live[vignetteGUID] = true
             local location = self.locations[vignetteGUID] or { maps = {} }
-            location.isMystery = isMystery
             local positions = GetVignetteMapPositions(vignetteGUID, mapIDs)
             local hasPosition = next(positions) ~= nil
             for mapID, position in pairs(positions) do
@@ -612,11 +621,8 @@ function scanner:DrawPins()
                 local pin = self.pins[vignetteGUID] or self:CreateBoonPin(vignetteGUID)
                 pin:SetSize(iconSize, iconSize)
                 if pin.texture then
-                    if location.isMystery then
-                        pin.texture:SetVertexColor(0.0, 1.0, 0.0, 1.0)
-                    else
-                        pin.texture:SetVertexColor(1.0, 0.1, 0.1, 1.0)
-                    end
+                    local r, g, b = GetSelectedPinColor()
+                    pin.texture:SetVertexColor(r, g, b, 1.0)
                 end
                 local x, y, onEdge = ProjectToMinimap(east, north, projectionScale, facing, squareMinimap)
                 pin:ClearAllPoints()
