@@ -18,6 +18,36 @@ function addonTable.RegisterOptions(addon)
         type = "group",
         name = L["Bears Boon Viewer"],
         args = {
+            showBoonPins = {
+                type = "toggle",
+                order = 0,
+                width = "full",
+                name = L["Show Mislaid Curiosity treasure chest pins"],
+                desc = L["Enable minimap pins to show potential locations."],
+                get = function()
+                    return addon.db.profile.showBoonPins
+                end,
+                set = function(_, value)
+                    addon.db.profile.showBoonPins = value
+                    addon:GetModule("Scanner"):UpdateActivity()
+                end,
+            },
+            scanInterval = {
+                type = "range",
+                order = 1,
+                width = "full",
+                name = L["Scan interval (seconds)"],
+                desc = L["How often to scan for Mislaid Curiosities."],
+                min = 0.5,
+                max = 10,
+                step = 0.5,
+                get = function()
+                    return addon.db.profile.scanInterval or 2.0
+                end,
+                set = function(_, value)
+                    addon.db.profile.scanInterval = value
+                end,
+            },
             font = {
                 type = "select",
                 order = 1,

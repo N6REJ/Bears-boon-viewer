@@ -1,0 +1,18 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Button name="BearsBoonFinderMapPinTemplate" mixin="MapCanvasPinMixin" virtual="true">
+        <Size x="20" y="20" />
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Icon" atlas="VignetteLoot">
+                    <Anchors>
+                        <Anchor point="CENTER" />
+                    </Anchors>
+                    <Size x="20" y="20" />
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad>self:SetScalingLimits(1, 1.0, 1.0); self.Icon:SetVertexColor(1.0, 0.1, 0.1, 1.0); self.Icon:SetSnapToPixelGrid(true); self.Icon:SetTexelSnappingBias(0);</OnLoad>
+        </Scripts>
+    </Button>
+</Ui>

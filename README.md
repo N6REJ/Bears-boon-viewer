@@ -20,6 +20,10 @@ when you leave or when those values are unavailable, and appears when values
 become available. Values refresh when the player aura, talents, specialization,
 equipment, or spell data changes.
 
+The addon also helps locate **Mislaid Curiosity** treasure chests inside Delves
+and Labyrinths by scanning for their vignettes and showing red pins on the
+minimap and world map (see below).
+
 <img width="457" height="280" alt="report" src="https://github.com/user-attachments/assets/ce522b95-1e6c-47f6-bd6e-8c260aabd9bf" />
 
 ## Display settings
@@ -40,6 +44,29 @@ The viewer has an X in its upper-right corner to hide it. Click the Bears Boon
 Viewer minimap button to refresh and show the display again. The addon-list icon
 and minimap button use the Boons spell icon; the minimap button has a gold-tinted
 tracking ring.
+
+## Mislaid Curiosity pins
+
+In addition to the boon display, the addon can help locate **Mislaid Curiosities**
+(hidden treasure chests) while you are in a Delve or Labyrinth. While scanning is
+active it watches for the Mislaid Curiosity vignette, records each location across
+the related maps of the current Delve/Labyrinth, and shows red pins:
+
+- **Minimap pins** appear for locations near you, projected onto the minimap and
+  clamped to its edge when out of view. Pins fade when pushed to the edge.
+- **World map pins** appear for every mapped location on the world map, so you can
+  plan a route before walking to them.
+- Pins are removed automatically once you get close enough to loot the chest.
+
+Scanning only runs inside a Delve or Labyrinth and only when **Show Mislaid
+Curiosity treasure chest pins** is enabled (on by default). Two options control it:
+
+- **Show Mislaid Curiosity treasure chest pins** — turns minimap/world map pins on
+  or off.
+- **Scan interval (seconds)** — how often to re-scan for Mislaid Curiosities
+  (0.5 to 10 seconds, default 2.0).
+
+Hover a pin for a tooltip reading "Potential Mislaid Curiosity".
 
 ## Interface compatibility
 

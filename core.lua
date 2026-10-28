@@ -56,6 +56,7 @@ local function SetFontSafe(fontString, fontName, size)
 end
 
 local addon = AceAddon:NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
+addonTable.addon = addon
 
 local defaults = {
     profile = {
@@ -73,6 +74,8 @@ local defaults = {
         -- Angle in degrees around the minimap where the button sits.
         -- WoW screen Y grows upward, so 270 = bottom, 90 = top, 0 = right.
         minimapButtonAngle = 270,
+        showBoonPins = true,
+        scanInterval = 2.0,
     },
 }
 
