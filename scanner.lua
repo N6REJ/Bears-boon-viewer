@@ -430,7 +430,7 @@ function scanner:EnsureMapDataProvider()
                 local pin = _G.WorldMapFrame:AcquirePin("BearsBoonFinderMapPinTemplate", location)
                 pin:SetPosition(position.x, position.y)
                 if location.isMystery then
-                    pin.Icon:SetVertexColor(1.0, 1.0, 0.0, 1.0)
+                    pin.Icon:SetVertexColor(0.0, 1.0, 0.0, 1.0)
                 else
                     pin.Icon:SetVertexColor(1.0, 0.1, 0.1, 1.0)
                 end
@@ -613,7 +613,7 @@ function scanner:DrawPins()
                 pin:SetSize(iconSize, iconSize)
                 if pin.texture then
                     if location.isMystery then
-                        pin.texture:SetVertexColor(1.0, 1.0, 0.0, 1.0)
+                        pin.texture:SetVertexColor(0.0, 1.0, 0.0, 1.0)
                     else
                         pin.texture:SetVertexColor(1.0, 0.1, 0.1, 1.0)
                     end
