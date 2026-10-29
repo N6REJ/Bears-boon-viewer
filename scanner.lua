@@ -419,6 +419,46 @@ function scanner:ReleaseAllPins()
     end
 end
 
+-- Called when the player's boon aura changes, which happens when a Mislaid
+-- Curiosity is picked up. Drop the pin closest to the player so it does not
+-- linger on the minimap/world map until the player happens to walk over the
+-- chest's old location (which may never happen if others already looted it).
+function scanner:RemoveNearestPin()
+    if not self.scanning or not self.locations then
+        return
+    end
+
+    local uiMapID = C_Map.GetBestMapForUnit("player")
+    local playerPosition = uiMapID and GetPlayerMapPosition(uiMapID)
+    if not playerPosition then
+        return
+    end
+
+    local bestGUID, bestDistance
+    for vignetteGUID, location in pairs(self.locations) do
+        local targetPosition = GetPositionOnMap(location.maps, uiMapID)
+        if targetPosition then
+            local dx = targetPosition.x - playerPosition.x
+            local dy = targetPosition.y - playerPosition.y
+            local distance = math.sqrt(dx * dx + dy * dy)
+            if not bestDistance or distance < bestDistance then
+                bestDistance = distance
+                bestGUID = vignetteGUID
+            end
+        end
+    end
+
+    -- Only remove a pin that is plausibly the chest just picked up. A boon
+    -- pickup requires being close to the chest, so a generous (but bounded)
+    -- radius avoids dropping unrelated pins.
+    if bestGUID and bestDistance and bestDistance <= 0.1 then
+        self.locations[bestGUID] = nil
+        self:ReleasePin(bestGUID)
+        self:DrawPins()
+        self:RefreshMapPins()
+    end
+end
+
 function scanner:EnsureMapDataProvider()
     if self.mapDataProvider or not _G.WorldMapFrame or not MapCanvasDataProviderMixin then
         return
@@ -520,6 +560,10 @@ function scanner:ScanVignettes()
         end
     end
 
+    -- A vignette that is no longer live may have been looted (by the player
+    -- or someone else) or may simply be out of range. Remove it only when the
+    -- player is close enough to have looted it, so out-of-range chests keep
+    -- their pins for planning.
     local playerPosition = GetPlayerMapPosition(uiMapID)
     if playerPosition then
         for vignetteGUID, location in pairs(self.locations) do

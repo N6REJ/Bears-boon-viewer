@@ -497,6 +497,22 @@ function addon:RefreshSpellValues()
         return false
     end
 
+    local scanner = self:GetModule and self:GetModule("Scanner", true)
+    -- A boon pickup changes the aura's values. Tell the Mislaid Curiosity
+    -- scanner to drop the nearest pin so it doesn't linger until the player
+    -- happens to walk over the chest's old location.
+    if (boonValuesBecameAvailable or boonValuesChanged) and scanner
+            and type(scanner.RemoveNearestPin) == "function" then
+        pcall(scanner.RemoveNearestPin, scanner)
+    end
+
+    -- Also rescan vignettes promptly on a boon change so proximity-based
+    -- removal runs while the player is still at the chest.
+    if (boonValuesBecameAvailable or boonValuesChanged) and scanner
+            and scanner.scanning and type(scanner.ScanVignettes) == "function" then
+        pcall(scanner.ScanVignettes, scanner)
+    end
+
     local shouldShow = (self.waitingForBoon and not self.viewerManuallyClosed)
         or (self.viewerManuallyClosed and boonValuesChanged)
         or boonValuesBecameAvailable
