@@ -253,6 +253,7 @@ function scanner:OnEnable()
     self.pins = {}
     self.sparePins = {}
     self.locations = {}
+    self.looted = {}
     self.scanning = false
     self.inDelve = false
     self.scanned = false
@@ -341,6 +342,7 @@ function scanner:UpdateActivity()
             self.instanceKey = nil
             self.currentMapID = nil
             wipe(self.locations)
+            wipe(self.looted)
             self:ReleaseAllPins()
             self:RefreshMapPins()
         end
@@ -452,6 +454,8 @@ function scanner:RemoveNearestPin()
     -- pickup requires being close to the chest, so a generous (but bounded)
     -- radius avoids dropping unrelated pins.
     if bestGUID and bestDistance and bestDistance <= 0.1 then
+        self.looted = self.looted or {}
+        self.looted[bestGUID] = true
         self.locations[bestGUID] = nil
         self:ReleasePin(bestGUID)
         self:DrawPins()
@@ -521,6 +525,7 @@ function scanner:ScanVignettes()
     local instanceKey = GetInstanceKey()
     if self.instanceKey and self.instanceKey ~= instanceKey then
         wipe(self.locations)
+        wipe(self.looted)
         self:ReleaseAllPins()
     end
     self.instanceKey = instanceKey
@@ -540,7 +545,7 @@ function scanner:ScanVignettes()
             vignetteInfo = nil
         end
         local curiosityID = GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
-        if curiosityID == CURIOSITY_VIGNETTE_ID then
+        if curiosityID == CURIOSITY_VIGNETTE_ID and not (self.looted and self.looted[vignetteGUID]) then
             curiosityCount = curiosityCount + 1
             if not vignetteInfo then
                 hiddenCount = hiddenCount + 1
