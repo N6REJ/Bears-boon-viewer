@@ -254,7 +254,6 @@ function scanner:OnEnable()
     self.sparePins = {}
     self.locations = {}
     self.looted = {}
-    self.vignetteClassification = {}
     self.scanning = false
     self.inDelve = false
     self.scanned = false
@@ -344,7 +343,6 @@ function scanner:UpdateActivity()
             self.currentMapID = nil
             wipe(self.locations)
             wipe(self.looted)
-            wipe(self.vignetteClassification)
             self:ReleaseAllPins()
             self:RefreshMapPins()
         end
@@ -528,7 +526,6 @@ function scanner:ScanVignettes()
     if self.instanceKey and self.instanceKey ~= instanceKey then
         wipe(self.locations)
         wipe(self.looted)
-        wipe(self.vignetteClassification)
         self:ReleaseAllPins()
     end
     self.instanceKey = instanceKey
@@ -547,28 +544,8 @@ function scanner:ScanVignettes()
         if not ok then
             vignetteInfo = nil
         end
-
-        -- Classify the vignette. Prefer the game's own vignetteInfo when it is
-        -- available; for out-of-range (hidden) vignettes reuse a cached
-        -- classification instead of guessing from the GUID, which produced false
-        -- positives (e.g. hex-mask rooms in the Labyrinth).
-        local isCuriosity
-        if vignetteInfo then
-            local infoID = GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
-            local name
-            if vignetteInfo.name ~= nil and not IsSecret(vignetteInfo.name) then
-                name = vignetteInfo.name
-            end
-            local nameMatch = (type(name) == "string") and name:lower():find("curiosity", 1, true)
-            isCuriosity = (infoID == CURIOSITY_VIGNETTE_ID) or (nameMatch ~= nil)
-            self.vignetteClassification = self.vignetteClassification or {}
-            self.vignetteClassification[vignetteGUID] = isCuriosity
-        else
-            self.vignetteClassification = self.vignetteClassification or {}
-            isCuriosity = self.vignetteClassification[vignetteGUID]
-        end
-
-        if isCuriosity and not (self.looted and self.looted[vignetteGUID]) then
+        local curiosityID = GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
+        if curiosityID == CURIOSITY_VIGNETTE_ID and not (self.looted and self.looted[vignetteGUID]) then
             curiosityCount = curiosityCount + 1
             if not vignetteInfo then
                 hiddenCount = hiddenCount + 1
