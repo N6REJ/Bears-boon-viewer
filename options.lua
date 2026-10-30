@@ -229,18 +229,11 @@ function addonTable.RegisterOptions(addon)
                     return FormatExclusionList(addon.db.profile.hexmaskExclusions)
                 end,
             },
-            exclusionSpacer = {
-                type = "description",
-                order = 202,
-                width = "relative",
-                relWidth = 0.23,
-                name = "",
-            },
             excludeCurrentLocation = {
                 type = "execute",
                 order = 203,
                 width = "relative",
-                relWidth = 0.24,
+                relWidth = 0.48,
                 name = L["Exclude Current Location"],
                 desc = L["Add your current map position to the exclusion list."],
                 func = function()
@@ -258,23 +251,16 @@ function addonTable.RegisterOptions(addon)
                 type = "execute",
                 order = 205,
                 width = "relative",
-                relWidth = 0.24,
+                relWidth = 0.48,
                 name = L["Include Current Location"],
                 desc = L["Remove exclusions near your current map position."],
                 func = function()
                     addon:RemoveCurrentLocationExclusions()
                 end,
             },
-            buttonSpacer2 = {
-                type = "description",
-                order = 206,
-                width = "relative",
-                relWidth = 0.02,
-                name = "",
-            },
             exportExclusions = {
                 type = "execute",
-                order = 209,
+                order = 210,
                 width = "full",
                 name = L["Export Exclusions"],
                 desc = L["Show the exclusion list as text you can copy."],
@@ -290,7 +276,7 @@ function addonTable.RegisterOptions(addon)
                 type = "execute",
                 order = 207,
                 width = "relative",
-                relWidth = 0.24,
+                relWidth = 0.48,
                 name = L["Clear Exclusions"],
                 desc = L["Remove all excluded chest locations."],
                 func = function()
@@ -300,6 +286,25 @@ function addonTable.RegisterOptions(addon)
                     if scanner.scanning then
                         scanner:ScanVignettes()
                     end
+                    LibStub("AceConfigRegistry-3.0"):NotifyChange(addonName)
+                end,
+            },
+            loadDefaultsSpacer = {
+                type = "description",
+                order = 208,
+                width = "relative",
+                relWidth = 0.02,
+                name = "",
+            },
+            loadDefaultExclusions = {
+                type = "execute",
+                order = 209,
+                width = "relative",
+                relWidth = 0.48,
+                name = L["Load Default Exclusions"],
+                desc = L["Replace the exclusion list with the built-in defaults."],
+                func = function()
+                    addon:LoadDefaultExclusions()
                     LibStub("AceConfigRegistry-3.0"):NotifyChange(addonName)
                 end,
             },

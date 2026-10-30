@@ -57,11 +57,13 @@ Inside the Labyrinth, some hidden vignettes are false matches at the fire hexmas
 The exclusion list is shown at the bottom of `/boon`, as `[x, y]` pairs in map percent. If no saved list exists, it starts with a built-in default list of known false-match locations. The **Use exclusions** checkbox under the pin option turns exclusion matching on or off. You can change the list with:
 
 *   **Exclude Current Location** — adds your current map position.
-*   **Include Current Location** — removes exclusions within 2 map-percent of your position.
-*   **Clear Exclusions** — empties the list.
+*   **Include Current Location** — removes exclusions within 1 map-percent of your position.
+*   **Clear Exclusions** — empties the list. It stays empty after reloading; the defaults are not reapplied.
+*   **Load Default Exclusions** — replaces the list with the built-in defaults.
+*   **Export Exclusions** — opens a window with the list as `[x, y]` text you can copy.
 *   `/boon exclude x y` — adds a point by coordinates, for example `/boon exclude 26.80, 33.20`. The alias `/boon exclusion x y` also works.
 
-Each change rescans right away when you're in a delve, and reports how many chests were excluded.
+Each change rescans right away when you're in a delve, and reports how many chests were excluded. The built-in defaults are used only when no saved list exists yet.
 
 ### Vignette debug window
 

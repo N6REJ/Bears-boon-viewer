@@ -64,12 +64,9 @@ local DEFAULT_HEXMASK_EXCLUSIONS = {
     { x = 26.29, y = 34.38 }, { x = 26.97, y = 34.04 }, { x = 26.86, y = 33.09 },
     { x = 20.76, y = 21.06 }, { x = 20.00, y = 20.90 }, { x = 19.05, y = 17.29 },
     { x = 18.38, y = 16.87 }, { x = 17.99, y = 17.38 }, { x = 17.70, y = 18.00 },
-    { x = 18.26, y = 18.68 }, { x = 59.64, y = 21.74 }, { x = 59.67, y = 20.61 },
-    { x = 59.05, y = 19.85 }, { x = 58.15, y = 20.37 }, { x = 57.01, y = 20.32 },
-    { x = 57.03, y = 21.28 }, { x = 57.08, y = 22.32 }, { x = 57.66, y = 23.03 },
-    { x = 36.84, y = 14.15 }, { x = 36.63, y = 16.41 }, { x = 56.75, y = 18.11 },
-    { x = 57.00, y = 17.66 }, { x = 56.57, y = 16.67 }, { x = 56.54, y = 16.18 },
-    { x = 56.99, y = 16.26 },
+    { x = 18.26, y = 18.68 }, { x = 36.84, y = 14.15 }, { x = 36.63, y = 16.41 },
+    { x = 56.75, y = 18.11 }, { x = 57.00, y = 17.66 }, { x = 56.57, y = 16.67 },
+    { x = 56.54, y = 16.18 }, { x = 56.99, y = 16.26 },
 }
 
 local defaults = {
@@ -700,7 +697,21 @@ function addon:AddCurrentLocationExclusion()
     self:AddExclusionFromText(string.format("%.2f %.2f", x, y))
 end
 
-local INCLUDE_RADIUS_PERCENT = 2
+local INCLUDE_RADIUS_PERCENT = 1
+
+function addon:LoadDefaultExclusions()
+    local list = self.db.profile.hexmaskExclusions
+    wipe(list)
+    for _, spot in ipairs(DEFAULT_HEXMASK_EXCLUSIONS) do
+        list[#list + 1] = { x = spot.x, y = spot.y }
+    end
+
+    self:Print(L["Default exclusions loaded."])
+    local scanner = self:GetModule("Scanner", true)
+    if scanner and scanner.scanning then
+        scanner:ScanVignettes()
+    end
+end
 
 function addon:RemoveCurrentLocationExclusions()
     local x, y = self:GetCurrentLocationPercent()
