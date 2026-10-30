@@ -58,6 +58,20 @@ end
 local addon = AceAddon:NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
 addonTable.addon = addon
 
+-- Map positions (percent) of hidden chests to ignore on the Labyrinth. Used
+-- only when no saved list exists yet.
+local DEFAULT_HEXMASK_EXCLUSIONS = {
+    { x = 26.29, y = 34.38 }, { x = 26.97, y = 34.04 }, { x = 26.86, y = 33.09 },
+    { x = 20.76, y = 21.06 }, { x = 20.00, y = 20.90 }, { x = 19.05, y = 17.29 },
+    { x = 18.38, y = 16.87 }, { x = 17.99, y = 17.38 }, { x = 17.70, y = 18.00 },
+    { x = 18.26, y = 18.68 }, { x = 59.64, y = 21.74 }, { x = 59.67, y = 20.61 },
+    { x = 59.05, y = 19.85 }, { x = 58.15, y = 20.37 }, { x = 57.01, y = 20.32 },
+    { x = 57.03, y = 21.28 }, { x = 57.08, y = 22.32 }, { x = 57.66, y = 23.03 },
+    { x = 36.84, y = 14.15 }, { x = 36.63, y = 16.41 }, { x = 56.75, y = 18.11 },
+    { x = 57.00, y = 17.66 }, { x = 56.57, y = 16.67 }, { x = 56.54, y = 16.18 },
+    { x = 56.99, y = 16.26 },
+}
+
 local defaults = {
     profile = {
         font = defaultFontName,
@@ -81,6 +95,7 @@ local defaults = {
             b = 0,
         },
         scanInterval = 2.0,
+        useExclusions = true,
     },
 }
 
@@ -143,6 +158,12 @@ end
 
 function addon:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("BearsBoonViewerDB", defaults, true)
+    if self.db.profile.hexmaskExclusions == nil then
+        self.db.profile.hexmaskExclusions = {}
+        for _, spot in ipairs(DEFAULT_HEXMASK_EXCLUSIONS) do
+            table.insert(self.db.profile.hexmaskExclusions, { x = spot.x, y = spot.y })
+        end
+    end
 
     -- Migrate legacy string pin colors to RGB tables.
     local profile = self.db.profile
@@ -172,8 +193,8 @@ function addon:OnInitialize()
     end
 
     _G.SLASH_BEARBoonViewer1 = "/boon"
-    _G.SlashCmdList.BEARBoonViewer = function()
-        self:SlashCommand()
+    _G.SlashCmdList.BEARBoonViewer = function(input)
+        self:SlashCommand(input)
     end
     addonTable.RegisterOptions(self)
 
@@ -497,10 +518,7 @@ function addon:RefreshSpellValues()
         return false
     end
 
-    local scanner = nil
-    if self.GetModule then
-        scanner = self:GetModule("Scanner", true)
-    end
+    local scanner = self:GetModule("Scanner", true)
     -- A boon pickup changes the aura's values. Tell the Mislaid Curiosity
     -- scanner to drop the nearest pin so it doesn't linger until the player
     -- happens to walk over the chest's old location.
@@ -569,6 +587,167 @@ function addon:OnUnitAura(_, unit)
     C_Timer.After(0.25, retryRefresh)
 end
 
-function addon:SlashCommand()
+local MAX_DEBUG_LINES = 500
+
+function addon:ShowDebugFrame()
+    self.debugLines = self.debugLines or {}
+    if not self.debugFrame then
+        local frame = AceGUI:Create("Frame")
+        frame:SetTitle(L["Bears Boon Viewer Debug"])
+        frame:SetLayout("List")
+        frame:SetWidth(640)
+        frame:SetHeight(400)
+
+        local editBox = AceGUI:Create("MultiLineEditBox")
+        editBox:SetLabel("")
+        editBox:DisableButton(true)
+        editBox:SetNumLines(18)
+        editBox:SetFullWidth(true)
+        frame:AddChild(editBox)
+
+        local clearButton = AceGUI:Create("Button")
+        clearButton:SetText(L["Clear"])
+        clearButton:SetWidth(120)
+        clearButton:SetCallback("OnClick", function()
+            wipe(self.debugLines)
+            self.debugEditBox:SetText("")
+        end)
+        frame:AddChild(clearButton)
+
+        self.debugFrame = frame
+        self.debugEditBox = editBox
+    end
+
+    self.debugFrame:Show()
+    self.debugEditBox:SetText(table.concat(self.debugLines or {}, "\n"))
+end
+
+function addon:ShowExportWindow(title, text)
+    if not self.exportFrame then
+        local frame = AceGUI:Create("Frame")
+        frame:SetLayout("List")
+        frame:SetWidth(520)
+        frame:SetHeight(200)
+
+        local editBox = AceGUI:Create("MultiLineEditBox")
+        editBox:SetLabel("")
+        editBox:DisableButton(true)
+        editBox:SetNumLines(5)
+        editBox:SetFullWidth(true)
+        frame:AddChild(editBox)
+
+        self.exportFrame = frame
+        self.exportEditBox = editBox
+    end
+
+    self.exportFrame:SetTitle(title)
+    self.exportEditBox:SetText(text)
+    self.exportFrame:Show()
+end
+
+function addon:AppendDebugLine(text)
+    self.debugLines = self.debugLines or {}
+    table.insert(self.debugLines, text)
+    while #self.debugLines > MAX_DEBUG_LINES do
+        table.remove(self.debugLines, 1)
+    end
+
+    if self.debugFrame and self.debugFrame:IsShown() then
+        self.debugEditBox:SetText(table.concat(self.debugLines, "\n"))
+    end
+end
+
+function addon:AddExclusionFromText(text)
+    local cleaned = text:gsub("[,%[%]]", " "):gsub("%s+", " "):match("^%s*(.-)%s*$")
+    local x, y = cleaned:match("^([%d%.]+) ([%d%.]+)$")
+    x, y = tonumber(x), tonumber(y)
+    if not x or not y then
+        self:Print(L["Enter coordinates as x, y, for example 26.80, 33.20."])
+        return
+    end
+
+    local list = self.db.profile.hexmaskExclusions
+    list[#list + 1] = { x = x, y = y }
+    self:Print(string.format(L["Added excluded chest location [%.2f, %.2f]."], x, y))
+    local scanner = self:GetModule("Scanner", true)
+    if scanner and scanner.scanning then
+        scanner:ScanVignettes()
+        self:Print(string.format(L["Hidden chests excluded on this map: %d."], scanner.lastScanDetails.excludedCount or 0))
+    else
+        self:Print(L["Exclusions apply when you are inside a Delve or Labyrinth."])
+    end
+end
+
+function addon:GetCurrentLocationPercent()
+    local mapID = C_Map.GetBestMapForUnit("player")
+    local ok, position = pcall(C_Map.GetPlayerMapPosition, mapID, "player")
+    local ok2, x, y = pcall(function()
+        return position:GetXY()
+    end)
+    if not mapID or not ok or not position or not ok2 or type(x) ~= "number" or type(y) ~= "number" then
+        return nil
+    end
+    return x * 100, y * 100
+end
+
+function addon:AddCurrentLocationExclusion()
+    local x, y = self:GetCurrentLocationPercent()
+    if not x then
+        self:Print(L["Unable to read your map position here."])
+        return
+    end
+
+    self:AddExclusionFromText(string.format("%.2f %.2f", x, y))
+end
+
+local INCLUDE_RADIUS_PERCENT = 2
+
+function addon:RemoveCurrentLocationExclusions()
+    local x, y = self:GetCurrentLocationPercent()
+    if not x then
+        self:Print(L["Unable to read your map position here."])
+        return
+    end
+
+    local list = self.db.profile.hexmaskExclusions
+    local removed = 0
+    for i = #list, 1, -1 do
+        local dx = list[i].x - x
+        local dy = list[i].y - y
+        if dx * dx + dy * dy <= INCLUDE_RADIUS_PERCENT * INCLUDE_RADIUS_PERCENT then
+            table.remove(list, i)
+            removed = removed + 1
+        end
+    end
+
+    if removed == 0 then
+        self:Print(L["No exclusions near your location."])
+        return
+    end
+
+    self:Print(string.format(L["Removed %d exclusion(s) near your location."], removed))
+    local scanner = self:GetModule("Scanner", true)
+    if scanner and scanner.scanning then
+        scanner:ScanVignettes()
+    end
+end
+
+function addon:SlashCommand(input)
+    local command = input and input:match("^%s*(.-)%s*$"):lower() or ""
+    local exclusionText = command:match("^exclusions?%s+(.+)$")
+    if exclusionText then
+        self:AddExclusionFromText(exclusionText)
+        return
+    end
+    if command == "debug" then
+        self.debugVignettes = not self.debugVignettes
+        if self.debugVignettes then
+            self:ShowDebugFrame()
+            self:AppendDebugLine(L["Vignette debug logging enabled. Each new vignette is logged once."])
+        else
+            self:AppendDebugLine(L["Vignette debug logging disabled."])
+        end
+        return
+    end
     rawget(self, "OpenOptionsDialog")()
 end

@@ -4,6 +4,18 @@ local SharedMedia = LibStub("LibSharedMedia-3.0")
 local MIN_FONT_SIZE = 8
 local MAX_FONT_SIZE = 48
 
+local function FormatExclusionList(list)
+    if not list or #list == 0 then
+        return L["None"]
+    end
+
+    local parts = {}
+    for _, spot in ipairs(list) do
+        parts[#parts + 1] = string.format("[%.2f, %.2f]", spot.x, spot.y)
+    end
+    return table.concat(parts, " ")
+end
+
 local function GetFontOptions()
     local fonts = {}
     for _, fontName in ipairs(SharedMedia:List("font")) do
@@ -30,6 +42,23 @@ function addonTable.RegisterOptions(addon)
                 set = function(_, value)
                     addon.db.profile.showBoonPins = value
                     addon:GetModule("Scanner"):UpdateActivity()
+                end,
+            },
+            useExclusions = {
+                type = "toggle",
+                order = 0.5,
+                width = "full",
+                name = L["Use exclusions"],
+                desc = L["Hide hidden chests near the excluded locations on the Labyrinth map."],
+                get = function()
+                    return addon.db.profile.useExclusions ~= false
+                end,
+                set = function(_, value)
+                    addon.db.profile.useExclusions = value
+                    local scanner = addon:GetModule("Scanner")
+                    if scanner.scanning then
+                        scanner:ScanVignettes()
+                    end
                 end,
             },
             scanInterval = {
@@ -184,6 +213,94 @@ function addonTable.RegisterOptions(addon)
                     if scanner.scanning then
                         scanner:DrawPins()
                     end
+                end,
+            },
+            exclusionHeader = {
+                type = "header",
+                order = 200,
+                name = L["Excluded hidden chest locations"],
+            },
+            exclusionList = {
+                type = "description",
+                order = 201,
+                width = "full",
+                fontSize = "medium",
+                name = function()
+                    return FormatExclusionList(addon.db.profile.hexmaskExclusions)
+                end,
+            },
+            exclusionSpacer = {
+                type = "description",
+                order = 202,
+                width = "relative",
+                relWidth = 0.23,
+                name = "",
+            },
+            excludeCurrentLocation = {
+                type = "execute",
+                order = 203,
+                width = "relative",
+                relWidth = 0.24,
+                name = L["Exclude Current Location"],
+                desc = L["Add your current map position to the exclusion list."],
+                func = function()
+                    addon:AddCurrentLocationExclusion()
+                end,
+            },
+            buttonSpacer = {
+                type = "description",
+                order = 204,
+                width = "relative",
+                relWidth = 0.02,
+                name = "",
+            },
+            includeCurrentLocation = {
+                type = "execute",
+                order = 205,
+                width = "relative",
+                relWidth = 0.24,
+                name = L["Include Current Location"],
+                desc = L["Remove exclusions near your current map position."],
+                func = function()
+                    addon:RemoveCurrentLocationExclusions()
+                end,
+            },
+            buttonSpacer2 = {
+                type = "description",
+                order = 206,
+                width = "relative",
+                relWidth = 0.02,
+                name = "",
+            },
+            exportExclusions = {
+                type = "execute",
+                order = 209,
+                width = "full",
+                name = L["Export Exclusions"],
+                desc = L["Show the exclusion list as text you can copy."],
+                func = function()
+                    local parts = {}
+                    for _, spot in ipairs(addon.db.profile.hexmaskExclusions) do
+                        parts[#parts + 1] = string.format("[%.2f, %.2f]", spot.x, spot.y)
+                    end
+                    addon:ShowExportWindow(L["Exclusion Export"], table.concat(parts, " "))
+                end,
+            },
+            clearExclusions = {
+                type = "execute",
+                order = 207,
+                width = "relative",
+                relWidth = 0.24,
+                name = L["Clear Exclusions"],
+                desc = L["Remove all excluded chest locations."],
+                func = function()
+                    wipe(addon.db.profile.hexmaskExclusions)
+                    addon:Print(L["Exclusion list cleared."])
+                    local scanner = addon:GetModule("Scanner")
+                    if scanner.scanning then
+                        scanner:ScanVignettes()
+                    end
+                    LibStub("AceConfigRegistry-3.0"):NotifyChange(addonName)
                 end,
             },
         },

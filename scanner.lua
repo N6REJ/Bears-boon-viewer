@@ -7,19 +7,9 @@ local DELVE_DIFFICULTY_ID = 208
 local LABYRINTH_MAP_ID = 2647
 local CURIOSITY_VIGNETTE_ID = 5482
 local DEFAULT_SCAN_INTERVAL = 2.0
-local BOON_PIN_SIZE = 25
-local BOON_PIN_MIN_SIZE = 16
-local BOON_PIN_MAX_SIZE = 32
-local REFERENCE_MINIMAP_VIEW_RADIUS = 300
+local BOON_PIN_SIZE = 20
 local EDGE_ALPHA = 0.6
 local FALLBACK_MINIMAP_SPAN = 0.18
-
-local PIN_COLORS = {
-    red = { 1.0, 0.1, 0.1 },
-    green = { 0.0, 1.0, 0.0 },
-    blue = { 0.1, 0.5, 1.0 },
-    yellow = { 1.0, 1.0, 0.0 },
-}
 
 local function GetSelectedPinColor()
     local profile = addon.db and addon.db.profile
@@ -29,7 +19,7 @@ local function GetSelectedPinColor()
     end
     return 0, 1, 0
 end
-local LOOT_DISTANCE = 0.018
+local PICKUP_DISTANCE = 0.03
 
 local INSTANCE_EVENTS = {
     "PLAYER_ENTERING_WORLD",
@@ -88,15 +78,20 @@ local function ReadVector2(value)
     return { x = x, y = y }
 end
 
-local function GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
-    if vignetteInfo and not IsSecret(vignetteInfo) then
-        local ok, id = pcall(function()
-            return vignetteInfo.vignetteID
-        end)
-        if ok and not IsSecret(id) and type(id) == "number" then
-            return id
-        end
+local function GetInfoVignetteID(vignetteInfo)
+    if not vignetteInfo or IsSecret(vignetteInfo) then
+        return nil
     end
+    local ok, id = pcall(function()
+        return vignetteInfo.vignetteID
+    end)
+    if ok and not IsSecret(id) and type(id) == "number" then
+        return id
+    end
+    return nil
+end
+
+local function GetGUIDVignetteID(vignetteGUID)
     if type(vignetteGUID) ~= "string" then
         return nil
     end
@@ -292,9 +287,9 @@ function scanner:OnDisable()
     self:RefreshMapPins()
 end
 
-function scanner:OnEvent(event, addonName)
+function scanner:OnEvent(event, loadedAddon)
     if event == "ADDON_LOADED" then
-        if addonName == "Blizzard_WorldMap" then
+        if loadedAddon == "Blizzard_WorldMap" then
             self:EnsureMapDataProvider()
             self:RefreshMapPins()
         end
@@ -343,6 +338,7 @@ function scanner:UpdateActivity()
             self.currentMapID = nil
             wipe(self.locations)
             wipe(self.looted)
+            self.vignetteClassification = {}
             self:ReleaseAllPins()
             self:RefreshMapPins()
         end
@@ -453,7 +449,7 @@ function scanner:RemoveNearestPin()
     -- Only remove a pin that is plausibly the chest just picked up. A boon
     -- pickup requires being close to the chest, so a generous (but bounded)
     -- radius avoids dropping unrelated pins.
-    if bestGUID and bestDistance and bestDistance <= 0.1 then
+    if bestGUID and bestDistance and bestDistance <= PICKUP_DISTANCE then
         self.looted = self.looted or {}
         self.looted[bestGUID] = true
         self.locations[bestGUID] = nil
@@ -514,6 +510,79 @@ function scanner:RefreshMapPins()
     end
 end
 
+local function DebugField(value)
+    if value == nil then
+        return "nil"
+    end
+    if IsSecret(value) then
+        return "secret"
+    end
+    return tostring(value)
+end
+
+function scanner:LogVignetteDebug(vignetteGUID, vignetteInfo, isCuriosity, uiMapID)
+    self.debugLogged = self.debugLogged or {}
+    if self.debugLogged[vignetteGUID] then
+        return
+    end
+    self.debugLogged[vignetteGUID] = true
+
+    addon:AppendDebugLine(string.format(
+        L["Vignette debug: guid=%s info=%s vignetteID=%s curiosity=%s name=%s uiMap=%s"],
+        DebugField(vignetteGUID),
+        vignetteInfo and "yes" or "no",
+        vignetteInfo and DebugField(vignetteInfo.vignetteID) or "n/a",
+        DebugField(isCuriosity),
+        vignetteInfo and DebugField(vignetteInfo.name) or "n/a",
+        DebugField(uiMapID)
+    ))
+end
+
+local function DebugPercent(value)
+    if type(value) ~= "number" then
+        return "n/a"
+    end
+    return string.format("%.1f", value * 100)
+end
+
+function scanner:LogVignettePlacement(vignetteGUID, position, playerPosition)
+    self.debugPlaced = self.debugPlaced or {}
+    if self.debugPlaced[vignetteGUID] then
+        return
+    end
+    self.debugPlaced[vignetteGUID] = true
+
+    addon:AppendDebugLine(string.format(
+        L["Vignette placement: guid=%s x=%s y=%s player=%s,%s"],
+        DebugField(vignetteGUID),
+        DebugPercent(position and position.x),
+        DebugPercent(position and position.y),
+        DebugPercent(playerPosition and playerPosition.x),
+        DebugPercent(playerPosition and playerPosition.y)
+    ))
+end
+
+-- Hidden chests within this distance (map fraction) of a saved exclusion point
+-- on the Labyrinth are treated as false matches and ignored.
+local FALSE_HEXMASK_MAP_ID = 2647
+local FALSE_HEXMASK_RADIUS = 0.005
+
+local function IsNearFalseHexmaskSpot(mapID, position)
+    local profile = addon.db and addon.db.profile
+    local exclusions = profile and profile.hexmaskExclusions
+    if not profile or profile.useExclusions == false or mapID ~= FALSE_HEXMASK_MAP_ID or not exclusions or not position then
+        return false
+    end
+    for _, spot in ipairs(exclusions) do
+        local dx = position.x - spot.x / 100
+        local dy = position.y - spot.y / 100
+        if dx * dx + dy * dy <= FALSE_HEXMASK_RADIUS * FALSE_HEXMASK_RADIUS then
+            return true
+        end
+    end
+    return false
+end
+
 function scanner:ScanVignettes()
     local uiMapID = C_Map.GetBestMapForUnit("player")
     local mapInfo = uiMapID and C_Map.GetMapInfo(uiMapID)
@@ -526,6 +595,7 @@ function scanner:ScanVignettes()
     if self.instanceKey and self.instanceKey ~= instanceKey then
         wipe(self.locations)
         wipe(self.looted)
+        self.vignetteClassification = {}
         self:ReleaseAllPins()
     end
     self.instanceKey = instanceKey
@@ -536,25 +606,49 @@ function scanner:ScanVignettes()
     local hiddenCount = 0
     local positionCount = 0
     local mappedCount = 0
+    local excludedCount = 0
     local vignettes = C_VignetteInfo.GetVignettes() or {}
-    local live = {}
 
     for _, vignetteGUID in ipairs(vignettes) do
         local ok, vignetteInfo = pcall(C_VignetteInfo.GetVignetteInfo, vignetteGUID)
         if not ok then
             vignetteInfo = nil
         end
-        local curiosityID = GetCuriosityVignetteID(vignetteGUID, vignetteInfo)
-        if curiosityID == CURIOSITY_VIGNETTE_ID and not (self.looted and self.looted[vignetteGUID]) then
+        self.vignetteClassification = self.vignetteClassification or {}
+        local infoID = GetInfoVignetteID(vignetteInfo)
+        local isCuriosity
+        if infoID then
+            isCuriosity = infoID == CURIOSITY_VIGNETTE_ID
+            self.vignetteClassification[vignetteGUID] = isCuriosity
+        elseif not vignetteInfo then
+            isCuriosity = self.vignetteClassification[vignetteGUID] == true
+                or GetGUIDVignetteID(vignetteGUID) == CURIOSITY_VIGNETTE_ID
+        end
+        if isCuriosity and not vignetteInfo then
+            local positions = GetVignetteMapPositions(vignetteGUID, mapIDs)
+            if IsNearFalseHexmaskSpot(uiMapID, GetPositionOnMap(positions, uiMapID)) then
+                isCuriosity = false
+                excludedCount = excludedCount + 1
+                self.locations[vignetteGUID] = nil
+                self:ReleasePin(vignetteGUID)
+            end
+        end
+
+        if addon.debugVignettes then
+            pcall(self.LogVignetteDebug, self, vignetteGUID, vignetteInfo, isCuriosity, uiMapID)
+        end
+        if isCuriosity and not (self.looted and self.looted[vignetteGUID]) then
             curiosityCount = curiosityCount + 1
             if not vignetteInfo then
                 hiddenCount = hiddenCount + 1
             end
 
-            live[vignetteGUID] = true
             local location = self.locations[vignetteGUID] or { maps = {} }
             local positions = GetVignetteMapPositions(vignetteGUID, mapIDs)
             local hasPosition = next(positions) ~= nil
+            if addon.debugVignettes then
+                pcall(self.LogVignettePlacement, self, vignetteGUID, GetPositionOnMap(positions, uiMapID), GetPlayerMapPosition(uiMapID))
+            end
             for mapID, position in pairs(positions) do
                 location.maps[mapID] = position
             end
@@ -565,26 +659,6 @@ function scanner:ScanVignettes()
         end
     end
 
-    -- A vignette that is no longer live may have been looted (by the player
-    -- or someone else) or may simply be out of range. Remove it only when the
-    -- player is close enough to have looted it, so out-of-range chests keep
-    -- their pins for planning.
-    local playerPosition = GetPlayerMapPosition(uiMapID)
-    if playerPosition then
-        for vignetteGUID, location in pairs(self.locations) do
-            if not live[vignetteGUID] then
-                local targetPosition = GetPositionOnMap(location.maps, uiMapID)
-                if targetPosition then
-                    local dx = targetPosition.x - playerPosition.x
-                    local dy = targetPosition.y - playerPosition.y
-                    if math.sqrt(dx * dx + dy * dy) <= LOOT_DISTANCE then
-                        self.locations[vignetteGUID] = nil
-                        self:ReleasePin(vignetteGUID)
-                    end
-                end
-            end
-        end
-    end
 
     for _, location in pairs(self.locations) do
         if uiMapID and GetPositionOnMap(location.maps, uiMapID) then
@@ -598,6 +672,7 @@ function scanner:ScanVignettes()
     self.lastScanDetails.positionCount = positionCount
     self.lastScanDetails.mappedCount = mappedCount
     self.lastScanDetails.mapIDsChecked = #mapIDs
+    self.lastScanDetails.excludedCount = excludedCount
     self.scanned = true
     self:DrawPins()
     self:RefreshMapPins()
@@ -634,7 +709,7 @@ function scanner:DrawPins()
     local minimapZoom = (minimap.GetZoom and minimap:GetZoom()) or 0
     if type(minimapZoom) ~= "number" or IsSecret(minimapZoom) then minimapZoom = 0 end
     local useWorldScale = mapWorldWidth and mapWorldHeight and type(viewRadius) == "number" and viewRadius > 0
-    local iconSize = 20
+    local iconSize = BOON_PIN_SIZE
     local projectionScale
     if useWorldScale then
         projectionScale = viewRadius
