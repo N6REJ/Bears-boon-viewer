@@ -19,7 +19,7 @@
   </defs>
   <rect class="bg" x="0" y="0" width="1000" height="360" rx="16" />
   <text class="title" x="64" y="34">N6REJ/Bears-boon-viewer downloads</text>
-  <text class="sub" x="64" y="352">Generated 2026-10-30</text>
+  <text class="sub" x="64" y="352">Generated 2026-10-31</text>
   <line x1="64" y1="52.00" x2="976" y2="52.00" class="grid"/>
   <text x="56" y="56.00" text-anchor="end" class="axis">92</text>
   <line x1="64" y1="94.00" x2="976" y2="94.00" class="grid"/>
@@ -34,15 +34,16 @@
   <text x="56" y="266.00" text-anchor="end" class="axis">15</text>
   <line x1="64" y1="304.00" x2="976" y2="304.00" class="grid"/>
   <text x="56" y="308.00" text-anchor="end" class="axis">0</text>
-  <path d="M 64.00 304 L 64.00 304.00 L 155.20 197.17 L 246.40 276.61 L 337.60 293.04 L 428.80 301.26 L 520.00 221.83 L 611.20 265.65 L 702.40 295.78 L 793.60 290.30 L 884.80 52.00 L 976.00 268.39 L 976.00 304 Z" fill="url(#fill-daily-black)"/>
-  <polyline class="line" points="64.00,304.00 155.20,197.17 246.40,276.61 337.60,293.04 428.80,301.26 520.00,221.83 611.20,265.65 702.40,295.78 793.60,290.30 884.80,52.00 976.00,268.39"/>
-  <circle class="dot" cx="976.00" cy="268.39" r="4.5"/>
+  <path d="M 64.00 304 L 64.00 304.00 L 146.91 197.17 L 229.82 276.61 L 312.73 293.04 L 395.64 301.26 L 478.55 221.83 L 561.45 265.65 L 644.36 295.78 L 727.27 290.30 L 810.18 52.00 L 893.09 268.39 L 976.00 213.61 L 976.00 304 Z" fill="url(#fill-daily-black)"/>
+  <polyline class="line" points="64.00,304.00 146.91,197.17 229.82,276.61 312.73,293.04 395.64,301.26 478.55,221.83 561.45,265.65 644.36,295.78 727.27,290.30 810.18,52.00 893.09,268.39 976.00,213.61"/>
+  <circle class="dot" cx="976.00" cy="213.61" r="4.5"/>
   
   <text class="axis" x="64.00" y="336" text-anchor="start">2026-10-20</text>
-  <text class="axis" x="246.40" y="336" text-anchor="middle">2026-10-22</text>
-  <text class="axis" x="428.80" y="336" text-anchor="middle">2026-10-24</text>
-  <text class="axis" x="611.20" y="336" text-anchor="middle">2026-10-26</text>
-  <text class="axis" x="793.60" y="336" text-anchor="middle">2026-10-28</text>
-  <text class="axis" x="976.00" y="336" text-anchor="end">2026-10-30</text>
-  <text class="latest" x="976" y="34" text-anchor="end">Latest day: 13</text>
+  <text class="axis" x="229.82" y="336" text-anchor="middle">2026-10-22</text>
+  <text class="axis" x="395.64" y="336" text-anchor="middle">2026-10-24</text>
+  <text class="axis" x="561.45" y="336" text-anchor="middle">2026-10-26</text>
+  <text class="axis" x="727.27" y="336" text-anchor="middle">2026-10-28</text>
+  <text class="axis" x="893.09" y="336" text-anchor="middle">2026-10-30</text>
+  <text class="axis" x="976.00" y="336" text-anchor="end">2026-10-31</text>
+  <text class="latest" x="976" y="34" text-anchor="end">Latest day: 33</text>
 </svg>
