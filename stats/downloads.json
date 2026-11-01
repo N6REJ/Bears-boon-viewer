@@ -3,25 +3,25 @@
   "owner": "N6REJ",
   "repo": "Bears-boon-viewer",
   "visibility": "public",
-  "generatedAt": "2026-10-31T09:59:17.067Z",
+  "generatedAt": "2026-11-01T10:50:27.783Z",
   "stats": {
-    "total": 244,
-    "day": 33,
-    "week": 146,
-    "month": 244,
-    "year": 244
+    "total": 248,
+    "day": 4,
+    "week": 150,
+    "month": 0,
+    "year": 248
   },
   "partial": {
     "day": false,
     "week": false,
-    "month": true,
+    "month": false,
     "year": true
   },
   "periods": {
     "day": {
-      "start": "2026-10-31",
-      "end": "2026-10-31",
-      "label": "2026-10-31"
+      "start": "2026-11-01",
+      "end": "2026-11-01",
+      "label": "2026-11-01"
     },
     "week": {
       "start": "2026-10-26",
@@ -29,9 +29,9 @@
       "label": "2026-W44"
     },
     "month": {
-      "start": "2026-10-01",
-      "end": "2026-10-31",
-      "label": "Oct 2026"
+      "start": "2026-11-01",
+      "end": "2026-11-30",
+      "label": "Nov 2026"
     },
     "year": {
       "start": "2026-01-01",
@@ -41,9 +41,9 @@
   },
   "snapshots": {
     "windowDays": 365,
-    "count": 12,
+    "count": 13,
     "firstDate": "2026-10-20",
-    "lastDate": "2026-10-31",
+    "lastDate": "2026-11-01",
     "series": {
       "2026-10-20": 0,
       "2026-10-21": 39,
@@ -56,7 +56,8 @@
       "2026-10-28": 106,
       "2026-10-29": 198,
       "2026-10-30": 211,
-      "2026-10-31": 244
+      "2026-10-31": 244,
+      "2026-11-01": 248
     }
   },
   "profile": {
