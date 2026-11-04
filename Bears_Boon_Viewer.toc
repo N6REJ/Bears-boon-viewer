@@ -1,5 +1,5 @@
 ## Interface: 120105
-## Version: 2026.10.19
+## Version: @project-version@
 ## Title: Bears Boon Viewer
 ## Notes: Bears Boon Viewer
 ## Author: Bearesquishy
