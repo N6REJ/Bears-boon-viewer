@@ -19,7 +19,7 @@
   </defs>
   <rect class="bg" x="0" y="0" width="1000" height="360" rx="16" />
   <text class="title" x="64" y="34">N6REJ/Bears-boon-viewer downloads</text>
-  <text class="sub" x="64" y="352">Generated 2026-11-04</text>
+  <text class="sub" x="64" y="352">Generated 2026-11-05</text>
   <line x1="64" y1="52.00" x2="976" y2="52.00" class="grid"/>
   <text x="56" y="56.00" text-anchor="end" class="axis">244</text>
   <line x1="64" y1="94.00" x2="976" y2="94.00" class="grid"/>
@@ -34,15 +34,16 @@
   <text x="56" y="266.00" text-anchor="end" class="axis">41</text>
   <line x1="64" y1="304.00" x2="976" y2="304.00" class="grid"/>
   <text x="56" y="308.00" text-anchor="end" class="axis">0</text>
-  <path d="M 64.00 304 L 64.00 304.00 L 124.80 263.72 L 185.60 253.39 L 246.40 249.26 L 307.20 248.23 L 368.00 217.25 L 428.80 202.79 L 489.60 199.69 L 550.40 194.52 L 611.20 99.51 L 672.00 86.08 L 732.80 52.00 L 793.60 304.00 L 854.40 299.87 L 915.20 295.74 L 976.00 294.70 L 976.00 304 Z" fill="url(#fill-monthly-black)"/>
-  <polyline class="line" points="64.00,304.00 124.80,263.72 185.60,253.39 246.40,249.26 307.20,248.23 368.00,217.25 428.80,202.79 489.60,199.69 550.40,194.52 611.20,99.51 672.00,86.08 732.80,52.00 793.60,304.00 854.40,299.87 915.20,295.74 976.00,294.70"/>
-  <circle class="dot" cx="976.00" cy="294.70" r="4.5"/>
+  <path d="M 64.00 304 L 64.00 304.00 L 121.00 263.72 L 178.00 253.39 L 235.00 249.26 L 292.00 248.23 L 349.00 217.25 L 406.00 202.79 L 463.00 199.69 L 520.00 194.52 L 577.00 99.51 L 634.00 86.08 L 691.00 52.00 L 748.00 304.00 L 805.00 299.87 L 862.00 295.74 L 919.00 294.70 L 976.00 288.51 L 976.00 304 Z" fill="url(#fill-monthly-black)"/>
+  <polyline class="line" points="64.00,304.00 121.00,263.72 178.00,253.39 235.00,249.26 292.00,248.23 349.00,217.25 406.00,202.79 463.00,199.69 520.00,194.52 577.00,99.51 634.00,86.08 691.00,52.00 748.00,304.00 805.00,299.87 862.00,295.74 919.00,294.70 976.00,288.51"/>
+  <circle class="dot" cx="976.00" cy="288.51" r="4.5"/>
   
   <text class="axis" x="64.00" y="336" text-anchor="start">2026-10-20</text>
-  <text class="axis" x="246.40" y="336" text-anchor="middle">2026-10-23</text>
-  <text class="axis" x="428.80" y="336" text-anchor="middle">2026-10-26</text>
-  <text class="axis" x="611.20" y="336" text-anchor="middle">2026-10-29</text>
-  <text class="axis" x="793.60" y="336" text-anchor="middle">2026-11-01</text>
-  <text class="axis" x="976.00" y="336" text-anchor="end">2026-11-04</text>
-  <text class="latest" x="976" y="34" text-anchor="end">Latest month: 9</text>
+  <text class="axis" x="235.00" y="336" text-anchor="middle">2026-10-23</text>
+  <text class="axis" x="406.00" y="336" text-anchor="middle">2026-10-26</text>
+  <text class="axis" x="577.00" y="336" text-anchor="middle">2026-10-29</text>
+  <text class="axis" x="748.00" y="336" text-anchor="middle">2026-11-01</text>
+  <text class="axis" x="919.00" y="336" text-anchor="middle">2026-11-04</text>
+  <text class="axis" x="976.00" y="336" text-anchor="end">2026-11-05</text>
+  <text class="latest" x="976" y="34" text-anchor="end">Latest month: 15</text>
 </svg>
