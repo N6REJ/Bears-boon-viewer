@@ -19,7 +19,7 @@ local function GetSelectedPinColor()
     end
     return 0, 1, 0
 end
-local PICKUP_DISTANCE = 0.03
+local PICKUP_DISTANCE = 0.1
 
 local INSTANCE_EVENTS = {
     "PLAYER_ENTERING_WORLD",
@@ -608,6 +608,7 @@ function scanner:ScanVignettes()
     local mappedCount = 0
     local excludedCount = 0
     local vignettes = C_VignetteInfo.GetVignettes() or {}
+    local live = {}
 
     for _, vignetteGUID in ipairs(vignettes) do
         local ok, vignetteInfo = pcall(C_VignetteInfo.GetVignetteInfo, vignetteGUID)
@@ -656,9 +657,40 @@ function scanner:ScanVignettes()
                 positionCount = positionCount + 1
             end
             self.locations[vignetteGUID] = location
+            live[vignetteGUID] = true
         end
     end
 
+
+    -- Drop pins for vignettes that are no longer reported (looted or moved
+    -- out of range) when the player is close enough to have looted them, or
+    -- when they were explicitly marked as looted. This keeps picked-up boons
+    -- from lingering on the minimap/world map until the next full scan.
+    local staleGUIDs = {}
+    for vignetteGUID in pairs(self.locations) do
+        if not live[vignetteGUID] then
+            staleGUIDs[#staleGUIDs + 1] = vignetteGUID
+        end
+    end
+    local playerPosition = GetPlayerMapPosition(uiMapID)
+    for _, vignetteGUID in ipairs(staleGUIDs) do
+        local location = self.locations[vignetteGUID]
+        local shouldRemove = self.looted and self.looted[vignetteGUID] == true
+        if not shouldRemove and playerPosition and location then
+            local targetPosition = GetPositionOnMap(location.maps, uiMapID)
+            if targetPosition then
+                local dx = targetPosition.x - playerPosition.x
+                local dy = targetPosition.y - playerPosition.y
+                if math.sqrt(dx * dx + dy * dy) <= PICKUP_DISTANCE then
+                    shouldRemove = true
+                end
+            end
+        end
+        if shouldRemove then
+            self.locations[vignetteGUID] = nil
+            self:ReleasePin(vignetteGUID)
+        end
+    end
 
     for _, location in pairs(self.locations) do
         if uiMapID and GetPositionOnMap(location.maps, uiMapID) then

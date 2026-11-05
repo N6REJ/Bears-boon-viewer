@@ -524,9 +524,18 @@ function addon:RefreshSpellValues()
     end
 
     -- Also rescan vignettes promptly on a boon change so proximity-based
-    -- removal runs while the player is still at the chest.
+    -- removal runs while the player is still at the chest. Rescan again
+    -- shortly afterwards in case the vignette disappears a little later, so
+    -- picked-up boons don't linger on the map.
     if (boonValuesBecameAvailable or boonValuesChanged) and scanner ~= nil and scanner.scanning and type(scanner.ScanVignettes) == "function" then
         pcall(scanner.ScanVignettes, scanner)
+        if C_Timer and C_Timer.After then
+            C_Timer.After(1, function()
+                if scanner.scanning then
+                    pcall(scanner.ScanVignettes, scanner)
+                end
+            end)
+        end
     end
 
     local shouldShow = (self.waitingForBoon and not self.viewerManuallyClosed)
