@@ -19,7 +19,7 @@
   </defs>
   <rect class="bg" x="0" y="0" width="1000" height="360" rx="16" />
   <text class="title" x="64" y="34">N6REJ/Bears-boon-viewer downloads</text>
-  <text class="sub" x="64" y="352">Generated 2026-11-05</text>
+  <text class="sub" x="64" y="352">Generated 2026-11-06</text>
   <line x1="64" y1="52.00" x2="976" y2="52.00" class="grid"/>
   <text x="56" y="56.00" text-anchor="end" class="axis">150</text>
   <line x1="64" y1="94.00" x2="976" y2="94.00" class="grid"/>
@@ -34,16 +34,16 @@
   <text x="56" y="266.00" text-anchor="end" class="axis">25</text>
   <line x1="64" y1="304.00" x2="976" y2="304.00" class="grid"/>
   <text x="56" y="308.00" text-anchor="end" class="axis">0</text>
-  <path d="M 64.00 304 L 64.00 304.00 L 121.00 238.48 L 178.00 221.68 L 235.00 214.96 L 292.00 213.28 L 349.00 162.88 L 406.00 304.00 L 463.00 298.96 L 520.00 290.56 L 577.00 136.00 L 634.00 114.16 L 691.00 58.72 L 748.00 52.00 L 805.00 304.00 L 862.00 297.28 L 919.00 295.60 L 976.00 285.52 L 976.00 304 Z" fill="url(#fill-weekly-black)"/>
-  <polyline class="line" points="64.00,304.00 121.00,238.48 178.00,221.68 235.00,214.96 292.00,213.28 349.00,162.88 406.00,304.00 463.00,298.96 520.00,290.56 577.00,136.00 634.00,114.16 691.00,58.72 748.00,52.00 805.00,304.00 862.00,297.28 919.00,295.60 976.00,285.52"/>
-  <circle class="dot" cx="976.00" cy="285.52" r="4.5"/>
+  <path d="M 64.00 304 L 64.00 304.00 L 117.65 238.48 L 171.29 221.68 L 224.94 214.96 L 278.59 213.28 L 332.24 162.88 L 385.88 304.00 L 439.53 298.96 L 493.18 290.56 L 546.82 136.00 L 600.47 114.16 L 654.12 58.72 L 707.76 52.00 L 761.41 304.00 L 815.06 297.28 L 868.71 295.60 L 922.35 285.52 L 976.00 250.24 L 976.00 304 Z" fill="url(#fill-weekly-black)"/>
+  <polyline class="line" points="64.00,304.00 117.65,238.48 171.29,221.68 224.94,214.96 278.59,213.28 332.24,162.88 385.88,304.00 439.53,298.96 493.18,290.56 546.82,136.00 600.47,114.16 654.12,58.72 707.76,52.00 761.41,304.00 815.06,297.28 868.71,295.60 922.35,285.52 976.00,250.24"/>
+  <circle class="dot" cx="976.00" cy="250.24" r="4.5"/>
   
   <text class="axis" x="64.00" y="336" text-anchor="start">2026-10-20</text>
-  <text class="axis" x="235.00" y="336" text-anchor="middle">2026-10-23</text>
-  <text class="axis" x="406.00" y="336" text-anchor="middle">2026-10-26</text>
-  <text class="axis" x="577.00" y="336" text-anchor="middle">2026-10-29</text>
-  <text class="axis" x="748.00" y="336" text-anchor="middle">2026-11-01</text>
-  <text class="axis" x="919.00" y="336" text-anchor="middle">2026-11-04</text>
-  <text class="axis" x="976.00" y="336" text-anchor="end">2026-11-05</text>
-  <text class="latest" x="976" y="34" text-anchor="end">Latest week: 11</text>
+  <text class="axis" x="224.94" y="336" text-anchor="middle">2026-10-23</text>
+  <text class="axis" x="385.88" y="336" text-anchor="middle">2026-10-26</text>
+  <text class="axis" x="546.82" y="336" text-anchor="middle">2026-10-29</text>
+  <text class="axis" x="707.76" y="336" text-anchor="middle">2026-11-01</text>
+  <text class="axis" x="868.71" y="336" text-anchor="middle">2026-11-04</text>
+  <text class="axis" x="976.00" y="336" text-anchor="end">2026-11-06</text>
+  <text class="latest" x="976" y="34" text-anchor="end">Latest week: 32</text>
 </svg>
