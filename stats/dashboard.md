@@ -40,11 +40,11 @@ Charts are generated on the first run. Customize them freely; only the data tabl
 
 | Metric | Value |
 |---|---|
-| Total | 298 |
-| Day | 3 |
-| Week | 3 |
-| Month | 50 |
-| Year | 298 (partial) |
+| Total | 300 |
+| Day | 2 |
+| Week | 5 |
+| Month | 52 |
+| Year | 300 (partial) |
 
 | Field | Value |
 |---|---|
@@ -53,9 +53,9 @@ Charts are generated on the first run. Customize them freely; only the data tabl
 | Update mode | daily |
 | Period | week `2026-W46`, month `Nov 2026`, year `2026` |
 | Window | 365 days |
-| Snapshots | 22 |
+| Snapshots | 23 |
 | Partial | year |
-| Generated at | `2026-11-10T11:53:22.320Z` |
+| Generated at | `2026-11-11T11:29:29.009Z` |
 
 Source data: [`stats/downloads.json`](https://raw.githubusercontent.com/N6REJ/Bears-boon-viewer/main/stats/downloads.json)
 
