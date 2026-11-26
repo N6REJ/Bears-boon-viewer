@@ -53,9 +53,9 @@ Charts are generated on the first run. Customize them freely; only the data tabl
 | Update mode | daily |
 | Period | week `2026-W48`, month `Nov 2026`, year `2026` |
 | Window | 365 days |
-| Snapshots | 37 |
+| Snapshots | 38 |
 | Partial | year |
-| Generated at | `2026-11-25T13:39:38.724Z` |
+| Generated at | `2026-11-26T13:16:22.448Z` |
 
 Source data: [`stats/downloads.json`](https://raw.githubusercontent.com/N6REJ/Bears-boon-viewer/main/stats/downloads.json)
 
